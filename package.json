@@ -1,8 +1,9 @@
 {
-  "name": "handlebars",
+  "name": "node-js-alias-game",
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
+    "lint:fix": "eslint --fix ./*.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,5 +13,10 @@
   "dependencies": {
     "express": "^4.21.0",
     "express-handlebars": "^8.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.1",
+    "eslint": "^9.11.1",
+    "globals": "^15.9.0"
   }
 }
