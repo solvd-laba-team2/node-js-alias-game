@@ -14,7 +14,7 @@ const ChatScheme = mongoose.Schema({
     messages: { type: [MessageSchema], default: [] }
 });
 
-const Chat = mongoose.model('Chat', ChatSchema);
+const Chat = mongoose.model('Chat', ChatScheme);
 
 module.exports = Chat;
 
