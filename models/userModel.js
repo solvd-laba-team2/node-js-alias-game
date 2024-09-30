@@ -11,11 +11,6 @@ const UserSchema = mongoose.Schema({
         required: [true, 'Please enter password']
     },
 
-    email: {
-        type: String,
-        required: [true, 'Please enter email']
-    },
-
     stats: {
         gamesPlayed: { type: Number, required: true, default: 0 },
         gamesWon: { type: Number, required: true, default: 0 },

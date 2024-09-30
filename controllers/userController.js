@@ -1,5 +1,4 @@
 const User = require("../models/userModel");
-
 exports.createUser = async (req, res) => {
     try {
         const newUser = await User.create(req.body);
@@ -10,10 +9,14 @@ exports.createUser = async (req, res) => {
     }
 }
 
-exports.getUserById = async (req, res) => {
-    const { id } = req.params;
+exports.getUser = async (req, res) => {
+    const { username } = req.body;
     try {
-        const user = await User.findById(id);
+        const user = await User.findOne({ username: username });
+        if (!user) {
+            console.log(`No user with username: ${username}`);
+            return null;
+        }
         console.log("Found user:\n", user);
         return user;
     }
