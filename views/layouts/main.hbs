@@ -1,34 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{title}}</title>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
+
 <body>
   <header>
     <nav class="navbar">
- 
+
       <a href="/" class="button left">Home</a>
 
-   {{#if (eq page 'login')}}
- 
-  <div class="right">
-    <a href="/register" class="button">Register</a>
-  </div>
-{{else if (eq page 'register')}}
+      {{#if (eq page 'login')}}
 
-  <div class="right">
-    <a href="/login" class="button">Login</a>
-  </div>
-{{else}}
+      <div class="right">
+        <a href="/register" class="button">Register</a>
+      </div>
+      {{else if (eq page 'register')}}
 
-  <div class="right">
-    <a href="/login" class="button">Login</a>
-    <a href="/register" class="button">Register</a>
-  </div>
-{{/if}}
+      <div class="right">
+        <a href="/login" class="button">Login</a>
+      </div>
+
+      {{else if isAuthenticated}}
+      <div class="right">
+        <a href="/logout" class="button">Logout</a>
+      </div>
+      {{else}}
+      <div class="right">
+        <a href="/login" class="button">Login</a>
+        <a href="/register" class="button">Register</a>
+      </div>
+      {{/if}}
 
     </nav>
   </header>
@@ -43,4 +49,5 @@
 
   <script src="/js/auth.js"></script>
 </body>
+
 </html>
