@@ -1,8 +1,8 @@
-import { Express } from "express";
+import { Application } from "express";
 import { engine } from "express-handlebars";
 import path from "path";
 
-export default (app: Express): void => {
+export default (app: Application): void => {
   app.engine(
     "hbs",
     engine({

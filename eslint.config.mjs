@@ -4,6 +4,9 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
+    ignores: ["src/public/*"],
+  },
+  {
     files: ["**/*.{js,mjs,cjs,ts}"],
     rules: {
       semi: ["error", "always"],
