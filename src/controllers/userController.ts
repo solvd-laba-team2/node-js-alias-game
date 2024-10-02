@@ -8,12 +8,14 @@ export const createUser = async (
   try {
     const newUser = await User.create(req.body);
     console.log("User created:\n", newUser);
-  } catch (error: any) {
-    console.error(error.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
   }
 };
 
-export const getUser = async (req: Request, res: Response) : Promise<any> => {
+export const getUser = async (req: Request, res: Response): Promise<any> => {
   const { username } = req.body;
   try {
     const user = await User.findOne({ username });
@@ -23,9 +25,10 @@ export const getUser = async (req: Request, res: Response) : Promise<any> => {
     }
     console.log("Found user:\n", user);
     return user;
-  } catch (error: any) {
-    console.error(error.message);
-    return null;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
   }
 };
 
