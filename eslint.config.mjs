@@ -11,16 +11,10 @@ export default [
     rules: {
       semi: ["error", "always"],
       quotes: ["error", "double", { allowTemplateLiterals: true }],
-      "no-used-vars": [
-        "error",
-        {
-          vars: "all",
-          args: "after-used",
-          caughtErrors: "all",
-          ignoreRestSiblings: false,
-          reportUsedIgnorePattern: false,
-        },
-      ],
+      "no-unused-vars": [
+        "warn",
+        { vars: "all", args: "after-used", ignoreRestSiblings: true },
+      ], // Add this line
     },
   },
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },

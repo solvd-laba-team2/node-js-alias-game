@@ -5,6 +5,7 @@
 /frontend/.env.production
 /frontend/.env.development
 
+*.env
 .env
 /dist/
 /node_modules/
