@@ -1,50 +1,47 @@
 <div class="game-room">
-  <h2>Game Room - Chat for Game {{gameId}}</h2>
-
-  <!-- Timer for the current turn -->
-  <div class="timer-container">
-    <h3>Time Left:</h3>
-    <div id="timer" class="timer-box">60</div>
-  </div>
-
-  <!-- Section displaying team messages -->
-  <div class="chat-window">
-    <h3>Chat History</h3>
-    <div class="chat-messages">
-      {{#each messages}}
-        <p><strong>{{this.username}}:</strong> {{this.message}}</p>
-      {{/each}}
+    <h2>Game Room - Chat for Game {{gameId}}</h2>
+    
+    <!-- Timer for the current turn -->
+    <div class="timer-container">
+        <h3>Time Left:</h3>
+        <div id="timer" class="timer-box">60</div>
     </div>
-  </div>
+    
+    <!-- Section displaying team messages -->
+    <div class="chat-window">
+        <h3>Chat History</h3>
+        <div class="chat-messages">
+            {{#each messages}}
+            <p><strong>{{this.username}}:</strong> {{this.message}}</p>
+            {{/each}}
+        </div>
+    </div>
 
-  <!-- Chat input for the current user -->
-  <div class="chat-input">
-    <h4>Send a message as {{currentUser}}</h4>
-    <form
-      id="chat-form"
-      data-game-id="{{gameId}}"
-      data-current-user="{{currentUser}}"
-    >
-      <input
-        id="message-input"
-        type="text"
-        name="message"
-        placeholder="Type your message..."
-        autocomplete="off"
-        required
-      />
-      <input type="hidden" name="username" value="{{currentUser}}" />
-      <button type="submit">Send</button>
-    </form>
-  </div>
+    <!-- Chat input for the current user -->
+    <div class="chat-input">
+        <h4>Send a message as {{currentUser}}</h4>
+        <form id="chat-form" data-game-id="{{gameId}}" data-current-user="{{currentUser}}">
+            <input id="message-input" type="text" name="message" placeholder="Type your message..." autocomplete="off" required>
+            <input type="hidden" name="username" value="{{currentUser}}">
+            <button type="submit">Send</button>
+        </form>
+    </div>
 
-  <script src="/js/socket.io.js"></script>
-  <script src="/js/chat.js"></script>
-  <script>
-    // Timer script let timeLeft = 60; // Set the timer for 60 seconds const
-    timerElement = document.getElementById('timer'); const countdown =
-    setInterval(() => { if (timeLeft <= 0) { clearInterval(countdown);
-    timerElement.innerHTML = 'Time is up!'; } else { timerElement.innerHTML =
-    timeLeft; timeLeft--; } }, 1000);
-  </script>
+    <script src="/js/socket.io.js"></script>
+    <script src="/js/chat.js"></script>
+    <script>
+        // Timer script
+        let timeLeft = 60; // Set the timer for 60 seconds
+        const timerElement = document.getElementById('timer');
+
+        const countdown = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(countdown);
+                timerElement.innerHTML = 'Time is up!';
+            } else {
+                timerElement.innerHTML = timeLeft;
+                timeLeft--;
+            }
+        }, 1000);
+    </script>
 </div>
