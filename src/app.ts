@@ -1,5 +1,6 @@
 import "dotenv/config";
-import express, { Application } from "express";
+import express from "express";
+import { Application } from "express";
 
 // Import your configuration files
 import configureHandlebars from "./config/handlebars";

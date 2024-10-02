@@ -106,3 +106,5 @@ export const getLogout = (req: Request, res: Response) => {
   res.clearCookie("token");
   return res.redirect("/login");
 };
+
+export default { getLogout, getLogin, getRegister, postLogin, postRegister };

@@ -13,10 +13,7 @@ export const createUser = async (
   }
 };
 
-export const getUser = async (
-  req: Request,
-  res: Response,
-): Promise<typeof User | null> => {
+export const getUser = async (req: Request, res: Response) : Promise<any> => {
   const { username } = req.body;
   try {
     const user = await User.findOne({ username });
@@ -31,3 +28,5 @@ export const getUser = async (
     return null;
   }
 };
+
+export default { getUser, createUser };
