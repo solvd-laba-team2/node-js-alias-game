@@ -4,17 +4,13 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["src/public/*"],
+    ignores: ["node_modules", "dist"],
   },
   {
     files: ["**/*.{js,mjs,cjs,ts}"],
     rules: {
       semi: ["error", "always"],
       quotes: ["error", "double", { allowTemplateLiterals: true }],
-      "no-unused-vars": [
-        "warn",
-        { vars: "all", args: "after-used", ignoreRestSiblings: true },
-      ], // Add this line
     },
   },
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
