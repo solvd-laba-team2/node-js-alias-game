@@ -1,8 +1,7 @@
 <h1>Create a New Game</h1>
-<p>Set up a new Alias game by choosing a name, the number of players, and
-  difficulty level.</p>
+<p>Set up a new Alias game by choosing a name, the number of players, and difficulty level.</p>
 
-<form action="/create-game" method="POST">
+<form action="/game/create" method="POST">
   <div>
     <label for="game-name">Game Name:</label>
     <input
@@ -34,6 +33,29 @@
       <option value="medium">Medium</option>
       <option value="hard">Hard</option>
     </select>
+  </div>
+
+  <!-- Optional fields to specify team information -->
+  <div>
+    <label for="team1-name">Team 1 Name:</label>
+    <input
+      type="text"
+      id="team1-name"
+      name="team1Name"
+      placeholder="Enter Team 1 name"
+      required
+    />
+  </div>
+
+  <div>
+    <label for="team2-name">Team 2 Name:</label>
+    <input
+      type="text"
+      id="team2-name"
+      name="team2Name"
+      placeholder="Enter Team 2 name"
+      required
+    />
   </div>
 
   <button type="submit" class="button">Create Game</button>

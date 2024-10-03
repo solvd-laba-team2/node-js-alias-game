@@ -1,5 +1,13 @@
 {
   "games": {
+    "456": {
+      "chatHistory": [
+        {
+          "username": "Alice",
+          "message": "wazzup"
+        }
+      ]
+    },
     "asd12": {
       "chatHistory": [
         {

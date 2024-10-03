@@ -1,12 +1,18 @@
 <div class="game-room">
-    <h2>Game Room - Chat for Game {{gameId}}</h2>
+    <h2>Game Room - Chat for Game {{gameName}}</h2>
     
     <!-- Timer for the current turn -->
     <div class="timer-container">
         <h3>Time Left:</h3>
         <div id="timer" class="timer-box">60</div>
     </div>
-    
+
+    <!-- Display current describer and guessers -->
+    <div id="roles">
+        <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
+        <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
+    </div>
+
     <!-- Section displaying team messages -->
     <div class="chat-window">
         <h3>Chat History</h3>
@@ -29,19 +35,4 @@
 
     <script src="/js/socket.io.js"></script>
     <script src="/js/chat.js"></script>
-    <script>
-        // Timer script
-        let timeLeft = 60; // Set the timer for 60 seconds
-        const timerElement = document.getElementById('timer');
-
-        const countdown = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(countdown);
-                timerElement.innerHTML = 'Time is up!';
-            } else {
-                timerElement.innerHTML = timeLeft;
-                timeLeft--;
-            }
-        }, 1000);
-    </script>
 </div>
