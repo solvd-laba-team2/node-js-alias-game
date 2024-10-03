@@ -27,3 +27,28 @@ socket.on('newTurn', (data) => {
     const { describer, guessers } = data;
     console.log(`New describer: ${describer}, guessers: ${guessers}`);
 });
+
+let timeLeft = 60;  // Start timer at 60 seconds
+const timerElement = document.getElementById('timer');
+
+const startTimer = () => {
+    const interval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(interval);
+            // Emit to the server that the time is up
+            socket.emit('timeUp', gameId);
+        } else {
+            timeLeft--;
+            timerElement.textContent = timeLeft;
+        }
+    }, 1000);
+};
+
+// Listen for new turn event to reset timer and update roles
+socket.on('newTurn', (data) => {
+    const { describer, guessers } = data;
+    document.getElementById('describer').textContent = describer;
+    document.getElementById('guessers').textContent = guessers.join(', ');
+    timeLeft = 60;  // Reset timer for the new turn
+    startTimer();  // Start the timer for the new turn
+});

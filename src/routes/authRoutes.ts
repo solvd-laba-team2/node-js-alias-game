@@ -6,7 +6,7 @@ const router = Router();
 
 // Route to the home page
 router.get("/", (req, res) => {
-  res.render("home", { title: "Alias Game - Home" });
+  res.render("home", { title: "Alias Game - Home",isLogged:true });
 });
 
 // Route to login page
