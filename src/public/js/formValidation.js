@@ -1,8 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     // Login form validation
     const loginForm = document.getElementById("login-form");
-    
-    if (loginForm) {
+    const newPasswordForm = document.getElementById("new-password-form");
+
+    if (loginForm || newPasswordForm) {
         loginForm.addEventListener("submit", (e) => {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
@@ -25,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (!valid) {
-                e.preventDefault(); 
+                e.preventDefault();
             }
         });
     }
 
     // Register form validation
     const registerForm = document.getElementById("register-form");
-    
+
     if (registerForm) {
         registerForm.addEventListener("submit", (e) => {
             const username = document.getElementById("username").value;
@@ -65,7 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (!valid) {
-                e.preventDefault(); 
+                e.preventDefault();
             }
         });
     }

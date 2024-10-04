@@ -8,5 +8,6 @@ router.get("/user/", verifyToken, userController.getUserPage);
 
 router.post("/user", userController.createUser);
 
+router.put("/user", verifyToken, userController.putNewPassword);
 
 export default router;

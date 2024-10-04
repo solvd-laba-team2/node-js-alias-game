@@ -9,10 +9,13 @@ export const verifyToken = (
   const token = req.cookies.token;
   try {
     const user = jwt.verify(token, process.env.JWT_SECRET);
+    //console.log(user);
     req.cookies.username = user.username;
     next();
-  } catch (err) {
-    console.error(err.message);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
     res.clearCookie("token");
     return res.redirect("/");
   }
