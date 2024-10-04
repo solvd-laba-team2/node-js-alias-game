@@ -24,6 +24,8 @@ router.post("/:gameId/chat/send", gameController.addMessageToChat);
 // Route to start a new turn in the game
 router.get("/:gameId/startTurn", gameController.startTurn);
 
+router.get("/:gameId", gameController.renderRoomPage);
+
 export default router;
 
 

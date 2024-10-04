@@ -5,33 +5,43 @@ interface MessageData {
   gameId: string;
   user: string;
 }
+interface JoinData {
+  gameId: string;
+  user: string;
+}
+
+const handleJoinRoom = (io: Server, socket: Socket, data: JoinData) => {
+  socket.join(data.gameId);
+  console.log(data);
+  console.log(`User ${data.user} joined room: ${data.gameId}`);
+  io.to(data.gameId).emit(
+    "systemMessage",
+    `User "${data.user}" has joined the room!`,
+  );
+};
+
+const handleChatMessage = (
+  io: Server,
+  socket: Socket,
+  messageData: MessageData,
+) => {
+  const { message, gameId, user } = messageData;
+  console.log("Message received:", messageData);
+  io.to(gameId).emit("chatMessage", { user, message, gameId });
+};
 
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     console.log("A user connected: " + socket.id);
 
-    socket.on("join room", (gameId: string) => {
-      socket.join(gameId);
-      console.log(`User ${socket.id} joined room: ${gameId}`);
+    
+    socket.on("join room", (data: JoinData) => handleJoinRoom(io, socket, data));
+    
 
-      // Notify others in the room about the new user
-      socket.to(gameId).emit("message", `User ${socket.id} has joined the room.`);
-    });
+    socket.on("chatMessage", (messageData: MessageData) =>
+      handleChatMessage(io, socket, messageData),
+    );
 
-    // Listen for a chat message from a client
-    socket.on("chat message", (messageData: MessageData) => {
-      const { message, gameId, user } = messageData;
-      console.log("Message received:", messageData);
-
-      // Broadcast the message to all clients
-      io.to(gameId).emit("chat message", {
-        user,
-        message,
-        gameId,
-      });
-    });
-
-    // When a user disconnects
     socket.on("disconnect", () => {
       console.log("User disconnected: " + socket.id);
     });
