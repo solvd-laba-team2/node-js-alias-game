@@ -13,7 +13,7 @@ export const renderCreateGameForm = (req: Request, res: Response) => {
 export const renderRoomPage = async (req: Request, res: Response) => {
   const gameId = req.params.gameId;
   const game = await GameService.getInstance().getGame(gameId);
-  const chatHistory = GameService.getInstance().getChatHistory(gameId);
+  const chatHistory = await GameService.getInstance().getChatHistory(gameId);
   res.render("room", {
     // gameId: newGame._id.toString(),
     gameName: gameId,
