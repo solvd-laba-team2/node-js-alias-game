@@ -26,7 +26,7 @@
     <!-- Chat input for the current user -->
     <div class="chat-input">
         <h4>Send a message as {{currentUser}}</h4>
-        <form id="chat-form" data-game-id="{{gameId}}" data-current-user="{{currentUser}}">
+        <form id="chat-form" data-game-id="{{gameName}}" data-current-user="{{currentUser}}">
             <input id="message-input" type="text" name="message" placeholder="Type your message..." autocomplete="off" required>
             <input type="hidden" name="username" value="{{currentUser}}">
             <button type="submit">Send</button>

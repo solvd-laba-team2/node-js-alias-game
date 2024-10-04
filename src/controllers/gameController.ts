@@ -15,7 +15,7 @@ export const createGame = async (req: Request, res: Response) => {
     res.render("room", {
       // gameId: newGame._id.toString(),
       gameName: gameName,
-      currentUser: req.body.username,  // You can add logic to pass the username
+      currentUser: res.locals.username,  // You can add logic to pass the username
       messages: chatHistory,
       team1: newGame.team1.players,
       team2: newGame.team2.players,

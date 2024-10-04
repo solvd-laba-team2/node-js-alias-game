@@ -84,7 +84,6 @@ class GameService {
     const describer =
       game.team1.players[game.currentTurn % game.team1.players.length];
     const guessers = game.team2.players;
-
     game.currentTurn += 1;
     await game.save();
 
