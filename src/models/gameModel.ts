@@ -1,22 +1,27 @@
 import { Schema, Document, model } from "mongoose";
 
+// Score interface definition
 interface IScore {
   word: string;
   status: "guessed" | "not guessed";
   guessed: string;
 }
 
+// Team interface definition
 interface ITeam {
   players: string[];
   chatID: string;
   score: IScore[];
 }
 
-interface IGame extends Document {
+// Game interface
+export interface IGame extends Document {
+  gameName: string;  // Added field for the game name
+  difficulty: "easy" | "medium" | "hard";  // Added field for the difficulty level
   status: "creating" | "playing" | "finished";
   team1: ITeam;
   team2: ITeam;
-  wonTeamId?: string;
+  currentTurn: number;
   createdAt: Date;
 }
 
@@ -32,7 +37,10 @@ const TeamSchema: Schema = new Schema({
   score: { type: [ScoreSchema], default: [] },
 });
 
+// Updated game schema with gameName and difficulty fields
 const GameSchema: Schema = new Schema({
+  gameName: { type: String, required: true },  // New field for the game name
+  difficulty: { type: String, enum: ["easy", "medium", "hard"], required: true },  // New field for the difficulty level
   status: {
     type: String,
     enum: ["creating", "playing", "finished"],
@@ -40,7 +48,7 @@ const GameSchema: Schema = new Schema({
   },
   team1: { type: TeamSchema, default: {} },
   team2: { type: TeamSchema, default: {} },
-  wonTeamId: { type: String },
+  currentTurn: { type: Number, default: 0 },
   createdAt: { type: Date, default: Date.now },
 });
 
