@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 // Import your configuration files
+import socketConnection from "./config/socket";
 import configureHandlebars from "./config/handlebars";
 import configureMiddleware from "./config/middleware";
 import configureRoutes from "./config/routes";
@@ -11,6 +12,7 @@ const app: Application = express();
 configureHandlebars(app);
 configureMiddleware(app);
 configureRoutes(app);
+const server = socketConnection(app);
 
 // Export the app for use in other modules
-export default app;
+export default server;

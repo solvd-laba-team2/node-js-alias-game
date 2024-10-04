@@ -1,12 +1,12 @@
 import authRoutes from "../routes/authRoutes";
 import userRoutes from "../routes/userRoutes";
-import chatRoutes from "../routes/chatRoutes";
 import gameRoutes from "../routes/gameRoutes";
 import { Application } from "express";
 
 export default (app: Application) => {
+  // User
   app.use("/", authRoutes);
   app.use("/", userRoutes);
-  app.use("/", chatRoutes);
+//  Game 
   app.use("/game", gameRoutes);
 };
