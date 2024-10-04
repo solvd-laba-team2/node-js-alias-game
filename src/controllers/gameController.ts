@@ -1,26 +1,38 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
+import game from "src/sockets/game";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
-  res.render("create-game");  // Rendering the createGame.hbs view
+  if (!res.locals.isAuthenticated) {
+    return res.redirect("/login");
+  }
+  res.render("create-game"); // Rendering the createGame.hbs view
+};
+
+export const renderRoomPage = async (req: Request, res: Response) => {
+  const gameId = req.params.gameId;
+  const game = await GameService.getInstance().getGame(gameId);
+  const chatHistory = GameService.getInstance().getChatHistory(gameId);
+  res.render("room", {
+    // gameId: newGame._id.toString(),
+    gameName: gameId,
+    currentUser: res.locals.username,
+    messages: chatHistory,
+    team1: game.team1.players,
+    team2: game.team2.players,
+    currentTurn: game.currentTurn,
+  });
 };
 
 export const createGame = async (req: Request, res: Response) => {
-  const { gameName, difficulty } = req.body;  // Receiving data from the body
+  const { gameName, difficulty } = req.body; // Receiving data from the body
   try {
-    const newGame = await GameService.getInstance().createGame(gameName, difficulty);  // Creating a new game
-    // Render the game room view with data
-    const chatHistory = await GameService.getInstance().getChatHistory(newGame._id.toString());  // Fetch chat history
-    res.render("room", {
-      // gameId: newGame._id.toString(),
-      gameName: gameName,
-      currentUser: res.locals.username,  // You can add logic to pass the username
-      messages: chatHistory,
-      team1: newGame.team1.players,
-      team2: newGame.team2.players,
-      currentTurn: newGame.currentTurn
-    });
+    const newGame = await GameService.getInstance().createGame(
+      gameName,
+      difficulty,
+    ); // Creating a new game
+    res.redirect(`/game/${newGame._id}`);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -43,8 +55,14 @@ export const updateScore = async (req: Request, res: Response) => {
   const { gameId, username, points } = req.params;
 
   try {
-    await GameService.getInstance().updateScore(gameId, username, parseInt(points));
-    res.status(200).json({ message: `${username}'s score updated by ${points} points` });
+    await GameService.getInstance().updateScore(
+      gameId,
+      username,
+      parseInt(points),
+    );
+    res
+      .status(200)
+      .json({ message: `${username}'s score updated by ${points} points` });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -95,4 +113,5 @@ export default {
   getChatHistory,
   addMessageToChat,
   startTurn,
+  renderRoomPage,
 };
