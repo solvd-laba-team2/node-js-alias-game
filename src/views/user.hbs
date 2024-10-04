@@ -1,0 +1,44 @@
+<h2>User Profile</h2>
+
+<div class="profile-container">
+    <div class="profile-info">
+        <h2>{{username}}</h2>
+
+        {{#if successMessage}}
+        <div class="alert alert-success">
+            {{successMessage}}
+        </div>
+        {{/if}}
+
+        {{#if errorMessage}}
+        <div class="alert alert-danger">
+            {{errorMessage}}
+        </div>
+        {{/if}}
+        <form method="post" action="/user/?_method=PUT" id="new-password-form">
+            <label for="password">New Password</label>
+            <input type="password" id="password" name="password">
+            <span id="password-error" class="error-message"></span>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div class="profile-stats">
+        <h3>Your Game Stats</h3>
+        <div class="stat-box">
+            <span class="stat-label">Games Played</span>
+            <span class="stat-value">{{gamesPlayed}}</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Games Won</span>
+            <span class="stat-value">{{gamesWon}}</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-label">Words Guessed</span>
+            <span class="stat-value">{{wordsGuessed}}</span>
+        </div>
+    </div>
+</div>
+
+<script src="../public/js/formValidation.js"></script>
+<script src="../public/js/putReqForPasswordChange.js"></script>

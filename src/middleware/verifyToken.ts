@@ -8,9 +8,14 @@ export const verifyToken = (
 ) => {
   const token = req.cookies.token;
   try {
-    jwt.verify(token, process.env.JWT_SECRET);
+    const user = jwt.verify(token, process.env.JWT_SECRET);
+    //console.log(user);
+    req.cookies.username = user.username;
     next();
-  } catch (err) {
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
     res.clearCookie("token");
     return res.redirect("/");
   }
