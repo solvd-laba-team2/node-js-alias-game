@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
 import chatSocket from "../sockets/chat";
-// import gameSocket from "../sockets/game";
+import gameSocket from "../sockets/game";
 
 class SocketService {
   private io: Server;
@@ -31,7 +31,8 @@ class SocketService {
   }
 
   _initialize() {
-    chatSocket(this.io);
+    chatSocket(this.io); // chatMessage, systemMessage, joinRoom
+    gameSocket(this.io); // turn management and other game events
   }
 
   emitToGameRoom(gameId: string, event: string, data: any) {
