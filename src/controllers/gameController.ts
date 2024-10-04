@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
-import game from "src/sockets/game";
+import { shortenId, getOriginalId } from "../utils/hash";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -12,8 +12,9 @@ export const renderCreateGameForm = (req: Request, res: Response) => {
 
 export const renderRoomPage = async (req: Request, res: Response) => {
   const gameId = req.params.gameId;
-  const game = await GameService.getInstance().getGame(gameId);
-  const chatHistory = await GameService.getInstance().getChatHistory(gameId);
+  const id = getOriginalId(gameId);
+  const game = await GameService.getInstance().getGame(id);
+  const chatHistory = await GameService.getInstance().getChatHistory(id);
   res.render("room", {
     // gameId: newGame._id.toString(),
     gameName: gameId,
@@ -32,7 +33,8 @@ export const createGame = async (req: Request, res: Response) => {
       gameName,
       difficulty,
     ); // Creating a new game
-    res.redirect(`/game/${newGame._id}`);
+    const shortId = shortenId(newGame._id.toString());
+    res.redirect(`/game/${shortId}`);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
