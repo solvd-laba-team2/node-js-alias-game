@@ -133,7 +133,15 @@ export const renderJoinGamePage = async (req: Request, res: Response) => {
 export const joinGame = async (req: Request, res: Response) => {
   const { gameCode } = req.body;
   try {
-    res.redirect(`/game/${gameCode}`);
+    const originalId = getOriginalId(gameCode);
+    const game = GameService.getInstance().getGame(originalId);
+    const games = await GameService.getInstance().getOnlyNotStartedGames();
+    if (!game) {
+      res.render("join-game", { games, errorMessage: "No game with such passcode!" });
+    }
+    else {
+      res.redirect(`/game/${gameCode}`);
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
