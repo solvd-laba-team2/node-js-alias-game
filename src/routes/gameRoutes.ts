@@ -20,7 +20,10 @@ router.post("/join", gameController.joinGame);
 router.post("/addUser", gameController.addUser);
 
 // Route to update the score for a specific user in the game
-router.get("/:gameId/updateScore/:username/:points", gameController.updateScore);
+router.get(
+    "/:gameId/updateScore/:username/:points",
+    gameController.updateScore,
+);
 
 // Route to get the chat history for a specific game
 router.get("/:gameId/chat", gameController.getChatHistory);
@@ -31,10 +34,7 @@ router.post("/:gameId/chat/send", gameController.addMessageToChat);
 // Route to start a new turn in the game
 router.get("/:gameId/startTurn", gameController.startTurn);
 
-router.get("/:gameId", gameController.renderRoomPage);
+router.get("/:gameId", verifyToken, gameController.renderRoomPage);
 
 
 export default router;
-
-
-
