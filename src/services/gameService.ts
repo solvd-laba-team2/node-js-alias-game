@@ -1,10 +1,14 @@
 import gameModel, { IGame } from "../models/gameModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
+import GameLogicService from "./gameLogicService";
 
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
+// active games collection
+  private activeGames: Map<string, IGame> = new Map();
+ 
   private constructor() {
     this.socketService = SocketService.getInstance();
   }
@@ -77,18 +81,80 @@ class GameService {
   }
 
   // Start a new turn
-  async startTurn(gameId: string): Promise<IGame | null> {
-    const game = await gameModel.findById(gameId);
+  // async startTurn(gameId: string): Promise<IGame | null> {
+  //   const game = await gameModel.findById(gameId);
+  //   if (!game) throw new Error("Game not found");
+
+  //   const describer =
+  //     game.team1.players[game.currentTurn % game.team1.players.length];
+  //   const guessers = game.team2.players;
+  //   game.currentTurn += 1;
+  //   await game.save();
+
+  //   return game;
+  // }
+
+// Method to fetch an active game from memory
+private getActiveGame(gameId: string): IGame | null {
+  return this.activeGames.get(gameId) || null;
+}
+
+// Method to update the current state of the game in memory
+private updateGameState(game: IGame): void {
+  this.activeGames.set(game._id.toString(), game);
+}
+
+// Method to start a new turn in the game
+async startTurn(gameId: string): Promise<void> {
+  let game = this.getActiveGame(gameId);
+
+  // If the game is not found in memory, fetch it from the database
+  if (!game) {
+    game = await gameModel.findById(gameId);
     if (!game) throw new Error("Game not found");
-
-    const describer =
-      game.team1.players[game.currentTurn % game.team1.players.length];
-    const guessers = game.team2.players;
-    game.currentTurn += 1;
-    await game.save();
-
-    return game;
   }
+
+  // Use GameLogicService to manage the logic for starting a new turn
+  const { describer, team } = GameLogicService.startTurn(game);
+
+  if (!describer) {
+    // End the game if no describer is available (all players have described)
+    await this.endGame(gameId);
+    return;
+  }
+
+  // Notify all players in the game room about the start of the new turn
+  this.socketService.emitToGameRoom(gameId, "turnStarted", {
+    describer,
+    team
+  });
+
+  // Update the state of the game in memory after changes
+  this.updateGameState(game);
+}
+
+// Method to end the game
+async endGame(gameId: string): Promise<void> {
+  const game = this.getActiveGame(gameId);
+  
+  if (!game) throw new Error("Game not found");
+
+  // Update game status to 'finished'
+  game.status = "finished";
+
+  // Save game state to database
+  await game.save();
+
+  // Remove game from active games in memory
+  this.activeGames.delete(gameId);
+
+  // Emit an event to notify players that the game has ended
+  this.socketService.emitToGameRoom(gameId, "gameEnded", {
+    message: "The game has ended!",
+  });
+}
+
+
 
   // Add a message to the game's chat
   async addMessage(
