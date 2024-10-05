@@ -40,6 +40,18 @@ class GameService {
     const game = await gameModel.findById(gameId); // Find the game in the database by ID
     return game; // Return the game (can be null if not found)
   }
+  // Get all games
+  async getGames(): Promise<IGame[] | null> {
+    const games = await gameModel.find().lean();
+    //console.log(games);
+
+    return games;
+  }
+
+  async getOnlyNotStartedGames(): Promise<IGame[] | null> {
+    const games = await gameModel.find({ status: "creating" }).lean();
+    return games;
+  }
 
   // Add a user to the game
   async addUser(gameId: string, teamId: "team1" | "team2", username: string) {
