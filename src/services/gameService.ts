@@ -32,6 +32,11 @@ class GameService {
     });
 
     await newGame.save(); // Save the new game to the database
+    this.socketService.emit("gameUpdated", { // Emit new game creation
+      action: "created",
+      game: newGame,
+    });
+
     return newGame; // Return the new game
   }
 
@@ -47,7 +52,7 @@ class GameService {
 
     return games;
   }
-
+  // Get only games with status "creating"
   async getOnlyNotStartedGames(): Promise<IGame[] | null> {
     const games = await gameModel.find({ status: "creating" }).lean();
     return games;
