@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
+import { Types } from "mongoose";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -13,8 +14,28 @@ export const renderCreateGameForm = (req: Request, res: Response) => {
 export const renderRoomPage = async (req: Request, res: Response) => {
   const gameId = req.params.gameId;
   const id = getOriginalId(gameId);
+
+  const errorOptions = {
+    gameName: "Game not found",
+    currentUser: res.locals.username,
+    messages: [],
+    team1: [],
+    team2: [],
+    currentTurn: 0,
+  };
+
+  if (!Types.ObjectId.isValid(id)) {
+    return res.render("room", errorOptions);
+  }
+
   const game = await GameService.getInstance().getGame(id);
+
+  if (!game) {
+    return res.render("room", errorOptions);
+  }
+
   const chatHistory = await GameService.getInstance().getChatHistory(id);
+
   res.render("room", {
     // gameId: newGame._id.toString(),
     gameName: gameId,
