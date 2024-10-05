@@ -26,11 +26,13 @@ export const renderRoomPage = async (req: Request, res: Response) => {
 };
 
 export const createGame = async (req: Request, res: Response) => {
-  const { gameName, difficulty } = req.body; // Receiving data from the body
+  const { gameName, difficulty, roundTime, totalRounds } = req.body; // Receiving data from the body
   try {
     const newGame = await GameService.getInstance().createGame(
       gameName,
       difficulty,
+      roundTime, 
+      totalRounds
     ); // Creating a new game
     res.redirect(`/game/${newGame._id}`);
   } catch (error) {
