@@ -23,6 +23,8 @@ export interface IGame extends Document {
   team2: ITeam;
   currentTurn: number;
   createdAt: Date;
+  roundTime: number;
+  totalRounds: number;
 }
 
 const ScoreSchema: Schema = new Schema({
@@ -41,6 +43,8 @@ const TeamSchema: Schema = new Schema({
 const GameSchema: Schema = new Schema({
   gameName: { type: String, required: true },  // New field for the game name
   difficulty: { type: String, enum: ["easy", "medium", "hard"], required: true },  // New field for the difficulty level
+  roundTime: { type: Number, required: true },
+  totalRounds: { type: Number, required: true},
   status: {
     type: String,
     enum: ["creating", "playing", "finished"],
