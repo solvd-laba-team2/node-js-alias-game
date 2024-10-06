@@ -5,9 +5,6 @@ import { Types } from "mongoose";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
-  if (!res.locals.isAuthenticated) {
-    return res.redirect("/login");
-  }
   res.render("create-game"); // Rendering the createGame.hbs view
 };
 
@@ -128,13 +125,38 @@ export const startTurn = async (req: Request, res: Response) => {
   }
 };
 
+export const renderJoinGamePage = async (req: Request, res: Response) => {
+  const games = await GameService.getInstance().getOnlyNotStartedGames();
+  res.render("join-game", { games: games });
+};
+
+export const joinGame = async (req: Request, res: Response) => {
+  const { gameCode } = req.body;
+  try {
+    const originalId = getOriginalId(gameCode);
+    const game = GameService.getInstance().getGame(originalId);
+    const games = await GameService.getInstance().getOnlyNotStartedGames();
+    if (!game) {
+      res.render("join-game", { games, errorMessage: "No game with such passcode!" });
+    }
+    else {
+      res.redirect(`/game/${gameCode}`);
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+};
+
 export default {
   renderCreateGameForm,
   createGame,
+  renderJoinGamePage,
+  joinGame,
   addUser,
   updateScore,
   getChatHistory,
   addMessageToChat,
   startTurn,
-  renderRoomPage,
+  renderRoomPage
 };
