@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
 import { Types } from "mongoose";
+import { generateWord, getWordGenerationOptions } from "../utils/randomWords";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -42,6 +43,15 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     team2: game.team2.players,
     currentTurn: game.currentTurn,
   });
+};
+
+export const getGenerateWord = (req: Request, res: Response) => {
+  const categories = req.body.categories;
+
+  const generativeOptions = getWordGenerationOptions(categories);
+  const word = generateWord(generativeOptions);
+
+  return res.send(200).json({ word });
 };
 
 export const createGame = async (req: Request, res: Response) => {
@@ -137,15 +147,16 @@ export const joinGame = async (req: Request, res: Response) => {
     const game = GameService.getInstance().getGame(originalId);
     const games = await GameService.getInstance().getOnlyNotStartedGames();
     if (!game) {
-      res.render("join-game", { games, errorMessage: "No game with such passcode!" });
-    }
-    else {
+      res.render("join-game", {
+        games,
+        errorMessage: "No game with such passcode!",
+      });
+    } else {
       res.redirect(`/game/${gameCode}`);
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-
 };
 
 export default {
@@ -158,5 +169,5 @@ export default {
   getChatHistory,
   addMessageToChat,
   startTurn,
-  renderRoomPage
+  renderRoomPage,
 };
