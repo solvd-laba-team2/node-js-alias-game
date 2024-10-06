@@ -114,7 +114,7 @@ export const getWordGenerationOptions = (
   };
 };
 
-export function generateWord(gameOptions: {
+function generateSingeWord(gameOptions: {
   slugOptions: RandomWordOptions<number>;
   lengthOptions: LengthOptions;
   slugLength: number;
@@ -132,14 +132,34 @@ export function generateWord(gameOptions: {
 
   const singleWord =
     filteredWords[Math.floor(Math.random() * filteredWords.length)];
+  return singleWord;
+}
 
+export function generateWord(gameOptions?: {
+  slugOptions: RandomWordOptions<number>;
+  lengthOptions: LengthOptions;
+  slugLength: number;
+}): string {
+  if (!gameOptions) {
+    return generateSlug(1, { format: "lower" });
+  }
+  const singleWord = generateSingeWord(gameOptions);
   if (!singleWord) {
-    return generateWord(gameOptions);
+    // If no word is okey with the length, generate a new one
+    for (let i = 0; i < 3; i++) {
+      const anotherWord = generateSingeWord(gameOptions);
+      if (anotherWord) {
+        return anotherWord;
+      }
+    }
+    throw new Error(
+      "Bad game options provided try to use different word length options",
+    );
   }
   return singleWord;
 }
 
-const difficultyWordOptions = {
+export const difficultyWordOptions = {
   easy: getWordGenerationOptions(["color", "animals", "family", "food"], {
     min: 0,
     max: 8,
@@ -150,7 +170,8 @@ const difficultyWordOptions = {
       ...nounCategories.slice(adjectiveCategories.length / 3),
     ],
     {
-      min: 5,
+      min: 8,
+      max: 10,
     },
   ),
   hard: getWordGenerationOptions([...adjectiveCategories, ...nounCategories], {

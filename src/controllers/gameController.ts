@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
 import { Types } from "mongoose";
-import { generateWord, getWordGenerationOptions } from "../utils/randomWords";
+import { generateWord, difficultyWordOptions, getWordGenerationOptions} from "../utils/randomWords";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -46,11 +46,9 @@ export const renderRoomPage = async (req: Request, res: Response) => {
 };
 
 export const getGenerateWord = (req: Request, res: Response) => {
-  const categories = req.body.categories;
-
-  const generativeOptions = getWordGenerationOptions(categories);
-  const word = generateWord(generativeOptions);
-
+  // const categories = req.body.categories;
+  // const generativeOptions = getWordGenerationOptions(categories); to create own options
+  const word = generateWord(difficultyWordOptions.medium);
   return res.send(200).json({ word });
 };
 
