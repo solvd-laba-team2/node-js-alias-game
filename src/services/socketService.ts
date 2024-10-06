@@ -38,6 +38,10 @@ class SocketService {
   emitToGameRoom(gameId: string, event: string, data: any) {
     this.io.to(gameId).emit(event, data);
   }
+
+  emit(event: string, data: any) {
+    this.io.emit(event, data);
+  }
 }
 
 export default SocketService;

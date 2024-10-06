@@ -36,6 +36,11 @@ class GameService {
     });
 
     await newGame.save(); // Save the new game to the database
+    this.socketService.emit("gameUpdated", { // Emit new game creation
+      action: "created",
+      game: newGame,
+    });
+
     return newGame; // Return the new game
   }
 
@@ -43,6 +48,18 @@ class GameService {
   async getGame(gameId: string): Promise<IGame | null> {
     const game = await gameModel.findById(gameId); // Find the game in the database by ID
     return game; // Return the game (can be null if not found)
+  }
+  // Get all games
+  async getGames(): Promise<IGame[] | null> {
+    const games = await gameModel.find().lean();
+    //console.log(games);
+
+    return games;
+  }
+  // Get only games with status "creating"
+  async getOnlyNotStartedGames(): Promise<IGame[] | null> {
+    const games = await gameModel.find({ status: "creating" }).lean();
+    return games;
   }
 
   // Add a user to the game
