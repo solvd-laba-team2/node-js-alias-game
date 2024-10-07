@@ -1,6 +1,10 @@
 <div class="game-room">
     <h2>Game Room - Chat for Game {{gameName}}</h2>
     
+    <!-- Display current roumd -->
+        <h3>Round:</h3>
+        <div id="timer" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
+
     <!-- Timer for the current turn -->
     <div class="word-field">
         <h1>Not generated yet</h1>
@@ -8,7 +12,7 @@
 
     <div class="timer-container">
         <h3>Time Left:</h3>
-        <div id="timer" class="timer-box">60</div>
+        <div id="timer" class="timer-box">{{roundTime}}</div>
     </div>
 
     <!-- Display current describer and guessers -->
