@@ -18,6 +18,7 @@ const handleJoinRoom = (io: Server, socket: Socket, data: JoinData) => {
     "systemMessage",
     `User "${data.user}" has joined the room!`,
   );
+  io.to(data.gameId).emit("new-word");
 };
 
 const handleChatMessage = (

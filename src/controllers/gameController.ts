@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
-import { Types } from "mongoose";
+import { get, Types } from "mongoose";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 
 // Render the form for creating a game
@@ -21,7 +21,7 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     team2: [],
     currentTurn: 0,
     roundTime: null,
-    totalRounds: null
+    totalRounds: null,
   };
 
   if (!Types.ObjectId.isValid(id)) {
@@ -48,6 +48,7 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     totalRounds: game.totalRounds,
   });
 };
+const currentWordsData = {};
 
 export const getGenerateWord = async (req: Request, res: Response) => {
   const gameCode = req.params.gameCode;
@@ -55,7 +56,22 @@ export const getGenerateWord = async (req: Request, res: Response) => {
   const game = await GameService.getInstance().getGame(gameId);
   const gameDifficulty = game.difficulty;
   const word = generateWord(difficultyWordOptions[gameDifficulty]);
+  currentWordsData[gameCode] = word;
   res.status(200).json({ word });
+};
+
+export const getCurrentWord = (req: Request, res: Response) => {
+  try {
+    const gameCode = req.params.gameCode;
+    const currentWord = currentWordsData[gameCode];
+    res.status(200).json({ word: currentWord });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(404).json({ error: err.message });
+    } else {
+      res.status(404).json({ error: "Current word not found" });
+    }
+  }
 };
 
 export const createGame = async (req: Request, res: Response) => {
@@ -64,8 +80,8 @@ export const createGame = async (req: Request, res: Response) => {
     const newGame = await GameService.getInstance().createGame(
       gameName,
       difficulty,
-      roundTime, 
-      totalRounds
+      roundTime,
+      totalRounds,
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
     res.redirect(`/game/${shortId}`);
@@ -177,4 +193,5 @@ export default {
   startTurn,
   renderRoomPage,
   getGenerateWord,
+  getCurrentWord,
 };

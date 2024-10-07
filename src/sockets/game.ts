@@ -10,7 +10,8 @@ const handleTimeUp = async (io: Server, gameId: string) => {
       return;
     }
 
-    const describer = game.team1.players[game.currentTurn % game.team1.players.length];
+    const describer =
+      game.team1.players[game.currentTurn % game.team1.players.length];
     const guessers = game.team2.players;
 
     io.to(gameId).emit("newTurn", { describer, guessers });
@@ -19,8 +20,15 @@ const handleTimeUp = async (io: Server, gameId: string) => {
   }
 };
 
+const updateUsersWord = async (io: Server, gameId: string) => {
+  console.log(gameId);
+  io.to(gameId).emit("new-word");
+};
+
+
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId));
+    socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
   });
 };

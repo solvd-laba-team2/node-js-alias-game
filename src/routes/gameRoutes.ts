@@ -38,4 +38,7 @@ router.get("/:gameId", verifyToken, gameController.renderRoomPage);
 
 router.get("/:gameCode/generateWord", gameController.getGenerateWord);
 
+
+router.get("/:gameCode/currentWord", gameController.getCurrentWord);
+
 export default router;
