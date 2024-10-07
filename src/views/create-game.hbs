@@ -19,7 +19,7 @@
       type="number"
       id="players"
       name="players"
-      min="2"
+      min="4"
       max="10"
       value="4"
       required
@@ -33,6 +33,28 @@
       <option value="medium">Medium</option>
       <option value="hard">Hard</option>
     </select>
+  </div>
+
+   <div>
+    <label for="round-time">Time for each round:</label>
+    <select id="round-time" name="roundTime">
+      <option value="60">60 seconds</option>
+      <option value="90">90 seconds</option>
+      <option value="120">120 seconds</option>
+    </select>
+  </div>
+
+   <div>
+    <label for="total-rounds">Number of rounds:</label>
+    <input
+      type="number"
+      id="total-rounds"
+      name="totalRounds"
+      min="1"
+      max="10"
+      value="5"
+      required
+    />
   </div>
 
   <!-- Optional fields to specify team information -->

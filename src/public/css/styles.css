@@ -1,7 +1,14 @@
+:root {
+  --light-bg: #f4f4f4;
+  --main: #4263f4;
+  --secondary: #28a745;
+  --secondary-hover: #218838;
+}
+
 /* Ogólne style */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: var(--light-bg);
   margin: 0;
   padding: 0;
   display: flex;
@@ -10,7 +17,7 @@ body {
 }
 
 header {
-  background-color: #333;
+  background-color: var(--main);
   color: #fff;
   padding: 10px 0;
   text-align: center;
@@ -21,6 +28,10 @@ main {
   padding: 20px;
 }
 
+ul {
+  list-style-type: none;
+}
+
 h1,
 h2,
 h3,
@@ -28,41 +39,26 @@ h4 {
   color: #333;
 }
 
-.button {
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  margin: 5px;
-  display: inline-block;
-}
-
-button:hover {
-  background-color: #218838;
-}
-
 footer {
   text-align: center;
   padding: 10px;
-  background-color: #333;
-  color: #fff;
+  background-color: var(--main);
+  color: white;
   bottom: 0;
   position: relative;
   bottom: 0;
 }
-
 /* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  background-color: #333;
+  background-color: var(--main);
 }
 
 .navbar a {
-  color: white;
+  color: black;
   text-decoration: none;
   font-size: 1em;
 }
@@ -110,7 +106,7 @@ input[type="password"] {
 
 input[type="text"]:focus,
 input[type="password"]:focus {
-  border-color: #28a745;
+  border-color: var(--secondary);
 }
 
 .error-message {
@@ -135,23 +131,93 @@ input[type="password"]:focus {
   margin-top: 5px;
 }
 
+#chat-form {
+  display: inline-flex;
+  gap: 10px;
+}
+
 /* Auth buttons */
 .auth-buttons {
   margin-top: 20px;
 }
 
-.auth-buttons .button {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px 20px;
-  background-color: #28a745;
-  color: white;
+/* CSS */
+.button {
   text-decoration: none;
-  border-radius: 5px;
+  align-items: center;
+  appearance: none;
+  background-color: #fff;
+  border-radius: 24px;
+  border-style: none;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 3px 5px -1px,
+    rgba(0, 0, 0, 0.14) 0 6px 10px 0, rgba(0, 0, 0, 0.12) 0 1px 18px 0;
+  box-sizing: border-box;
+  color: #3c4043;
+  cursor: pointer;
+  display: inline-flex;
+  fill: currentcolor;
+  font-family: "Google Sans", Roboto, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 48px;
+  justify-content: center;
+  letter-spacing: 0.25px;
+  line-height: normal;
+  max-width: 100%;
+  overflow: visible;
+  padding: 2px 24px;
+  position: relative;
+  text-align: center;
+  text-transform: none;
+  transition: box-shadow 280ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 15ms linear 30ms, transform 270ms cubic-bezier(0, 0, 0.2, 1) 0ms;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: auto;
+  will-change: transform, opacity;
+  z-index: 0;
 }
 
-.auth-buttons .button:hover {
-  background-color: #218838;
+.button:hover {
+  background: #f6f9fe;
+  color: #174ea6;
+}
+
+.button:active {
+  box-shadow: 0 4px 4px 0 rgb(60 64 67 / 30%),
+    0 8px 12px 6px rgb(60 64 67 / 15%);
+  outline: none;
+}
+
+.button:focus {
+  outline: none;
+  border: 2px solid #4285f4;
+}
+
+.button:not(:disabled) {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
+    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+}
+
+.button:not(:disabled):hover {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 2px 3px 0,
+    rgba(60, 64, 67, 0.15) 0 6px 10px 4px;
+}
+
+.button:not(:disabled):focus {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
+    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
+}
+
+.button:not(:disabled):active {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 4px 4px 0,
+    rgba(60, 64, 67, 0.15) 0 8px 12px 6px;
+}
+
+.button:disabled {
+  box-shadow: rgba(60, 64, 67, 0.3) 0 1px 3px 0,
+    rgba(60, 64, 67, 0.15) 0 4px 8px 3px;
 }
 
 body {
@@ -219,32 +285,25 @@ p {
   margin: 0 auto;
   color: #fff;
 }
-
 .alert-danger {
   background-color: #f44336;
+  /* Red background */
   border-color: #d32f2f;
+  /* Darker red border */
   color: white;
+  /* White text */
 }
-
-.alert-success {
-  background-color: #4caf50;
-  border-color: #388e3c;
-  color: white;
-}
-
-
 
 /* Timer styling */
 .timer-container {
   text-align: center;
   margin: 20px 0;
 }
-
 .timer-box {
   font-size: 2em;
   font-weight: bold;
   color: #333;
-  border: 2px solid #28a745;
+  border: 2px solid var(--main);
   border-radius: 5px;
   display: inline-block;
   padding: 10px;
@@ -253,6 +312,20 @@ p {
   background-color: #fff;
 }
 
+.alert-success {
+  background-color: #4caf50;
+  border-color: #388e3c;
+  color: white;
+}
+
+.game-list li {
+  margin-bottom: 15px;
+  list-style: none;
+}
+
+.game-list li:last-child {
+  margin-bottom: 0px;
+}
 /* User Profile Styles */
 .profile-container {
   display: flex;
@@ -308,7 +381,7 @@ p {
 }
 
 .stat-value {
-  color: #28a745;
+  color: var(--main);
   font-weight: bold;
   margin-left: 5px;
 }
