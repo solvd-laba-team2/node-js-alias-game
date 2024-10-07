@@ -30,13 +30,13 @@ class GameService {
     totalRounds: number
   ): Promise<IGame> {
     const newGame = new gameModel({
-      gameName, // Setting the game name
-      difficulty, // Setting the difficulty level
-      roundTime,  // Setting the time for each round
-      totalRounds,  // setting the total rounds
-      status: "creating", // Setting the game status
-      team1: { players: [], chatID: "", score: [] }, // Initializing team 1
-      team2: { players: [], chatID: "", score: [] }, // Initializing team 2
+      gameName, 
+      difficulty, 
+      roundTime,  
+      totalRounds,  
+      status: "creating", 
+      team1: { players: [], chatID: "", score: [] },
+      team2: { players: [], chatID: "", score: [] }, 
       currentTurn: 0, // Setting the current turn
       createdAt: new Date(), // Setting the creation date
     });
