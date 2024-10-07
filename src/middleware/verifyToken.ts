@@ -17,6 +17,6 @@ export const verifyToken = (
       console.error(error.message);
     }
     res.clearCookie("token");
-    return res.redirect("/");
+    return res.redirect("/login");
   }
 };

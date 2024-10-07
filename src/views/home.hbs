@@ -4,11 +4,10 @@
 {{#if isAuthenticated}}
 <div class="game-options">
   <a href="/game/create" class="button">Create a New Game</a>
-  <a href="/join-game" class="button">Join Existing Game</a>
-</div>
+  <a href="/game/join" class="button">Join Existing Game</a>
 {{else}}
-<div class="auth-buttons">
-  <a href="/login" class="button">Login</a>
-  <a href="/register" class="button">Register</a>
-</div>
+  <div class="auth-buttons">
+    <a href="/login" class="button">Login</a>
+    <a href="/register" class="button">Register</a>
+  </div>
 {{/if}}
