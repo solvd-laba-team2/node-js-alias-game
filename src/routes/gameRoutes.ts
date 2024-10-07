@@ -21,8 +21,8 @@ router.post("/addUser", gameController.addUser);
 
 // Route to update the score for a specific user in the game
 router.get(
-    "/:gameId/updateScore/:username/:points",
-    gameController.updateScore,
+  "/:gameId/updateScore/:username/:points",
+  gameController.updateScore,
 );
 
 // Route to get the chat history for a specific game
@@ -36,5 +36,6 @@ router.get("/:gameId/startTurn", gameController.startTurn);
 
 router.get("/:gameId", verifyToken, gameController.renderRoomPage);
 
+router.get("/:gameCode/generateWord", gameController.getGenerateWord);
 
 export default router;
