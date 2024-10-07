@@ -19,6 +19,8 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     team1: [],
     team2: [],
     currentTurn: 0,
+    roundTime: null,
+    totalRounds: null
   };
 
   if (!Types.ObjectId.isValid(id)) {
@@ -41,15 +43,19 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     team1: game.team1.players,
     team2: game.team2.players,
     currentTurn: game.currentTurn,
+    roundTime: game.roundTime,
+    totalRounds: game.totalRounds,
   });
 };
 
 export const createGame = async (req: Request, res: Response) => {
-  const { gameName, difficulty } = req.body; // Receiving data from the body
+  const { gameName, difficulty, roundTime, totalRounds } = req.body; // Receiving data from the body
   try {
     const newGame = await GameService.getInstance().createGame(
       gameName,
       difficulty,
+      roundTime, 
+      totalRounds
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
     res.redirect(`/game/${shortId}`);

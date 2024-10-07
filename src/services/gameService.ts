@@ -20,10 +20,14 @@ class GameService {
   async createGame(
     gameName: string,
     difficulty: "easy" | "medium" | "hard",
+    roundTime: number,
+    totalRounds: number
   ): Promise<IGame> {
     const newGame = new gameModel({
       gameName, // Setting the game name
       difficulty, // Setting the difficulty level
+      roundTime,  // Setting the time for each round
+      totalRounds,  // setting the total rounds
       status: "creating", // Setting the game status
       team1: { players: [], chatID: "", score: [] }, // Initializing team 1
       team2: { players: [], chatID: "", score: [] }, // Initializing team 2
