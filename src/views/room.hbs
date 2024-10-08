@@ -3,7 +3,7 @@
     
     <!-- Display current roumd -->
         <h3>Round:</h3>
-        <div id="timer" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
+        <div id="roundCounter" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
 
     <!-- Timer for the current turn -->
     <div class="timer-container">
@@ -36,6 +36,9 @@
             <button type="submit">Send</button>
         </form>
     </div>
+
+      <button onclick="startGame()">Start Game</button>
+    <button onclick="startTimer()">Start Timer</button>
     <script src="/js/socket.io.js"></script>
     <script src="/js/chat.js"></script>
 </div>
