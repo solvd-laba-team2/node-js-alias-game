@@ -101,7 +101,7 @@ export const updateScore = async (req: Request, res: Response) => {
   const { gameId, username, points } = req.params;
 
   try {
-    await GameService.getInstance().updateScore(
+    await GameService.getInstance().updateUserScoreInMemory(
       gameId,
       username,
       parseInt(points),

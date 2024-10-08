@@ -1,5 +1,5 @@
 import gameModel, { IGame } from "../models/gameModel";
-import userModel from "../models/userModel"
+import userModel from "../models/userModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
 import { getOriginalId } from "../utils/hash";
@@ -107,9 +107,9 @@ async saveUserScoresToDatabase(gameId: string): Promise<void> {
         user.stats.wordsGuessed += score;  
         user.stats.gamesPlayed += 1;  
 
-        if (/* condition for winning */) {
+        // if (/* condition for winning */) {
           user.stats.gamesWon += 1;
-        }
+        // }
 
         await user.save();
   
