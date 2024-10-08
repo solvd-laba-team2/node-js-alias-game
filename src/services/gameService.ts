@@ -1,10 +1,13 @@
 import gameModel, { IGame } from "../models/gameModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
+import { getOriginalId } from "../utils/hash";
+import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
+  private currentWords: Record<string, string> = {};
   private constructor() {
     this.socketService = SocketService.getInstance();
   }
@@ -21,13 +24,13 @@ class GameService {
     gameName: string,
     difficulty: "easy" | "medium" | "hard",
     roundTime: number,
-    totalRounds: number
+    totalRounds: number,
   ): Promise<IGame> {
     const newGame = new gameModel({
       gameName, // Setting the game name
       difficulty, // Setting the difficulty level
-      roundTime,  // Setting the time for each round
-      totalRounds,  // setting the total rounds
+      roundTime, // Setting the time for each round
+      totalRounds, // setting the total rounds
       status: "creating", // Setting the game status
       team1: { players: [], chatID: "", score: [] }, // Initializing team 1
       team2: { players: [], chatID: "", score: [] }, // Initializing team 2
@@ -36,7 +39,8 @@ class GameService {
     });
 
     await newGame.save(); // Save the new game to the database
-    this.socketService.emit("gameUpdated", { // Emit new game creation
+    this.socketService.emit("gameUpdated", {
+      // Emit new game creation
       action: "created",
       game: newGame,
     });
@@ -130,6 +134,23 @@ class GameService {
   // Get chat history for the game
   async getChatHistory(gameId: string) {
     return await chatService.getChatHistory(gameId); // Retrieve chat history from chatService
+  }
+
+  getCurrentWord(gameCode: string): string | null {
+    const currentWord = this.currentWords[gameCode];
+    if (!currentWord) {
+      return null;
+    }
+    return currentWord;
+  }
+
+  async generateWord(gameCode: string): Promise<string> {
+    const gameId = getOriginalId(gameCode);
+    const game = await this.getGame(gameId);
+    const gameDifficulty = game.difficulty;
+    const word = generateWord(difficultyWordOptions[gameDifficulty]);
+    this.currentWords[gameCode] = word;
+    return word;
   }
 }
 

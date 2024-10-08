@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
-import { get, Types } from "mongoose";
-import { generateWord, difficultyWordOptions } from "../utils/randomWords";
+import { Types } from "mongoose";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -48,22 +47,17 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     totalRounds: game.totalRounds,
   });
 };
-const currentWordsData = {};
 
 export const getGenerateWord = async (req: Request, res: Response) => {
   const gameCode = req.params.gameCode;
-  const gameId = getOriginalId(gameCode);
-  const game = await GameService.getInstance().getGame(gameId);
-  const gameDifficulty = game.difficulty;
-  const word = generateWord(difficultyWordOptions[gameDifficulty]);
-  currentWordsData[gameCode] = word;
+  const word = await GameService.getInstance().generateWord(gameCode);
   res.status(200).json({ word });
 };
 
 export const getCurrentWord = (req: Request, res: Response) => {
   try {
     const gameCode = req.params.gameCode;
-    const currentWord = currentWordsData[gameCode];
+    const currentWord = GameService.getInstance().getCurrentWord(gameCode);
     res.status(200).json({ word: currentWord });
   } catch (err: unknown) {
     if (err instanceof Error) {

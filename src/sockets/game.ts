@@ -21,7 +21,6 @@ const handleTimeUp = async (io: Server, gameId: string) => {
 };
 
 const updateUsersWord = async (io: Server, gameId: string) => {
-  console.log(gameId);
   io.to(gameId).emit("new-word");
 };
 

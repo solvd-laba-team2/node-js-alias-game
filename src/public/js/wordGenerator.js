@@ -15,8 +15,7 @@ socket.on("new-word", () => {
   });
 });
 
-button.addEventListener("click", (e) => {
-  e.preventDefault();
+const createNewWord = () => {
   const request = fetch(currentUrl + "/generateWord");
   request.then((response) => {
     if (response.ok === true) {
@@ -26,4 +25,11 @@ button.addEventListener("click", (e) => {
       });
     }
   });
+};
+
+socket.on("word-guessed", createNewWord);
+
+button.addEventListener("click", (e) => {
+  e.preventDefault();
+  createNewWord();
 });
