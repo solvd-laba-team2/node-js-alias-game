@@ -1,7 +1,9 @@
 import gameModel, { IGame } from "../models/gameModel";
-import userModel from "../models/userModel"
+import userModel from "../models/userModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
+import { getOriginalId } from "../utils/hash";
+import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 import GameLogicService from "./gameLogicService";
 
 class GameService {
@@ -11,6 +13,7 @@ class GameService {
   private activeGames: Map<string, IGame> = new Map();
   private userScores: Map<string, number> = new Map();
  
+  private currentWords: Record<string, string> = {};
   private constructor() {
     this.socketService = SocketService.getInstance();
   }
@@ -27,7 +30,7 @@ class GameService {
     gameName: string,
     difficulty: "easy" | "medium" | "hard",
     roundTime: number,
-    totalRounds: number
+    totalRounds: number,
   ): Promise<IGame> {
     const newGame = new gameModel({
       gameName, 
@@ -42,7 +45,8 @@ class GameService {
     });
 
     await newGame.save(); // Save the new game to the database
-    this.socketService.emit("gameUpdated", { // Emit new game creation
+    this.socketService.emit("gameUpdated", {
+      // Emit new game creation
       action: "created",
       game: newGame,
     });
@@ -103,9 +107,9 @@ async saveUserScoresToDatabase(gameId: string): Promise<void> {
         user.stats.wordsGuessed += score;  
         user.stats.gamesPlayed += 1;  
 
-        if (/* condition for winning */) {
+        // if (/* condition for winning */) {
           user.stats.gamesWon += 1;
-        }
+        // }
 
         await user.save();
   
@@ -196,6 +200,23 @@ private updateGameState(game: IGame): void {
   return games;
 }
 
+
+  getCurrentWord(gameCode: string): string | null {
+    const currentWord = this.currentWords[gameCode];
+    if (!currentWord) {
+      return null;
+    }
+    return currentWord;
+  }
+
+  async generateWord(gameCode: string): Promise<string> {
+    const gameId = getOriginalId(gameCode);
+    const game = await this.getGame(gameId);
+    const gameDifficulty = game.difficulty;
+    const word = generateWord(difficultyWordOptions[gameDifficulty]);
+    this.currentWords[gameCode] = word;
+    return word;
+  }
 }
 
 export default GameService;
