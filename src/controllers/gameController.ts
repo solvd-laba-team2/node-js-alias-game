@@ -20,14 +20,14 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     team2: [],
     currentTurn: 0,
     roundTime: null,
-    totalRounds: null
+    totalRounds: null,
   };
 
   if (!Types.ObjectId.isValid(id)) {
     return res.render("room", errorOptions);
   }
 
-  const game = await GameService.getInstance().getGame(id);
+  const game = await GameService.getInstance().getGame(gameId);
 
   if (!game) {
     return res.render("room", errorOptions);
@@ -48,13 +48,33 @@ export const renderRoomPage = async (req: Request, res: Response) => {
   });
 };
 
+export const getGenerateWord = async (req: Request, res: Response) => {
+  const gameCode = req.params.gameCode;
+  const word = await GameService.getInstance().generateWord(gameCode);
+  res.status(200).json({ word });
+};
+
+export const getCurrentWord = (req: Request, res: Response) => {
+  try {
+    const gameCode = req.params.gameCode;
+    const currentWord = GameService.getInstance().getCurrentWord(gameCode);
+    res.status(200).json({ word: currentWord });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      res.status(404).json({ error: err.message });
+    } else {
+      res.status(404).json({ error: "Current word not found" });
+    }
+  }
+};
+
 export const createGame = async (req: Request, res: Response) => {
   const { gameName, difficulty, roundTime, totalRounds } = req.body; // Receiving data from the body
   try {
     const newGame = await GameService.getInstance().createGame(
       gameName,
       difficulty,
-      roundTime, 
+      roundTime,
       totalRounds
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
@@ -81,7 +101,7 @@ export const updateScore = async (req: Request, res: Response) => {
   const { gameId, username, points } = req.params;
 
   try {
-    await GameService.getInstance().updateScore(
+    await GameService.getInstance().updateUserScoreInMemory(
       gameId,
       username,
       parseInt(points),
@@ -139,19 +159,19 @@ export const renderJoinGamePage = async (req: Request, res: Response) => {
 export const joinGame = async (req: Request, res: Response) => {
   const { gameCode } = req.body;
   try {
-    const originalId = getOriginalId(gameCode);
-    const game = GameService.getInstance().getGame(originalId);
+    const game = GameService.getInstance().getGame(gameCode);
     const games = await GameService.getInstance().getOnlyNotStartedGames();
     if (!game) {
-      res.render("join-game", { games, errorMessage: "No game with such passcode!" });
-    }
-    else {
+      res.render("join-game", {
+        games,
+        errorMessage: "No game with such passcode!",
+      });
+    } else {
       res.redirect(`/game/${gameCode}`);
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-
 };
 
 export default {
@@ -164,5 +184,7 @@ export default {
   getChatHistory,
   addMessageToChat,
   startTurn,
-  renderRoomPage
+  renderRoomPage,
+  getGenerateWord,
+  getCurrentWord,
 };
