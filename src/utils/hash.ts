@@ -4,7 +4,7 @@ const base62Chars =
   "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 // Function to convert a BigInt to Base62
-function encodeBase62(num: bigint): string {
+export function encodeBase62(num: bigint): string {
   let base62 = "";
   const base = BigInt(base62Chars.length);
 
@@ -27,7 +27,7 @@ export function shortenId(id: string): string {
 }
 
 // Function to decode a Base62 string back to BigInt
-function decodeBase62(base62: string): bigint {
+export function decodeBase62(base62: string): bigint {
   let num = BigInt(0);
   const base = BigInt(base62Chars.length);
 

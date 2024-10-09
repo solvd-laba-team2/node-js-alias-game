@@ -7,7 +7,15 @@ export default [
     ignores: ["node_modules", "dist", "src/public/js"],
   },
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
-  { languageOptions: { globals: globals.browser } },
+  {
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node
+      },
+      ecmaVersion: 2021
+    }
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -20,3 +28,4 @@ export default [
     },
   },
 ];
+
