@@ -133,11 +133,11 @@ class GameService {
     let game = this.getActiveGame(gameId);
 
     if (!game) {
-      game = await gameModel.findById(gameId);
+      game = await gameModel.findById(getOriginalId(gameId));
       if (!game) throw new Error("Game not found");
     }
 
-    const { describer, team } = GameLogicService.startTurn(game);
+    const { describer, guessers, team } = GameLogicService.startTurn(game);
 
     if (!describer) {
       await this.endGame(gameId);
@@ -146,6 +146,7 @@ class GameService {
 
     this.socketService.emitToGameRoom(gameId, "turnStarted", {
       describer,
+      guessers,
       team
     });
 

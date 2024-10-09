@@ -20,17 +20,13 @@ interface JoinData {
   };
 }
 
-// Map to track which socket IDs belong to which users and their game IDs
-const userSocketMap: { [userId: string]: { socketId: string; gameId: string }[] } = {};
 
 const handleJoinRoom = async (io: Server, socket: Socket, data: JoinData) => {
   socket.join(data.gameId);
-  console.log(data);
   console.log(`User ${data.user} joined room: ${data.gameId}`);
 
   const game = await GameService.getInstance().getGame(data.gameId);
 
-  // Check if the user is already part of the game
   if (!(game.team1.players.includes(data.user) || game.team2.players.includes(data.user))) {
     const team = GameLogicService.getRandomTeam();
     data.usersTeam = team;
@@ -38,12 +34,6 @@ const handleJoinRoom = async (io: Server, socket: Socket, data: JoinData) => {
   } else {
     data.usersTeam = game.team1.players.includes(data.user) ? "team1" : "team2";
   }
-
-  // Add the socket ID and game ID to the userSocketMap
-  if (!userSocketMap[data.user]) {
-    userSocketMap[data.user] = []; // Initialize an array for the user if it doesn't exist
-  }
-  userSocketMap[data.user].push({ socketId: socket.id, gameId: data.gameId });
 
   const updatedGame = await GameService.getInstance().getGame(data.gameId);
   data.team1.players = updatedGame.team1.players;

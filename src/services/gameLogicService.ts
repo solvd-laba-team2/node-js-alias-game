@@ -8,30 +8,34 @@ class GameLogicService {
   };
 
   // Public method to start a turn in the game
-  public static startTurn(game: IGame): { describer: string | null, team: "team1" | "team2" } {
+  public static startTurn(game: IGame): { describer: string | null, guessers: string[], team: "team1" | "team2" } {
     let team: "team1" | "team2";
 
     // Randomly select the starting team only in the first turn
     if (game.currentTurn === 0) {
-      team = this.getRandomTeam();
+      team = this.getRandomTeam(); // Assuming this method exists to randomly pick a team
     } else {
       // Alternate teams after the first turn
       team = game.currentTurn % 2 === 0 ? "team1" : "team2";
     }
 
-    // Select a describer from the players who haven't described yet
+    // Select a describer from the players of the current team
     const describer = this.getRandomDescriber(game[team].players, team);
 
-    // If no describer left, return null to signal end of game
+    // If no describer is available, signal end of the game
     if (!describer) {
-      return { describer: null, team };
+      return { describer: null, guessers: [], team };  // Return null if no describer found
     }
+
+    // Filter the guessers from the team (everyone except the describer)
+    const guessers = game[team].players.filter(player => player !== describer);
 
     // Increment the turn counter
     game.currentTurn += 1;
 
-    return { describer, team };
+    return { describer, guessers, team };
   }
+
 
   // Private method to randomly select a team (only for the first turn)
   public static getRandomTeam(): "team1" | "team2" {
