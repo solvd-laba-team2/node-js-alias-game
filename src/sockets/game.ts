@@ -10,47 +10,37 @@ import GameService from "../services/gameService";
 //       return;
 //     }
 
-    const describer = game.team1.players[game.currentTurn % game.team1.players.length];
-    const guessers = game.team2.players;
-    const roundTime = game.roundTime;
+//     const describer = game.team1.players[game.currentTurn % game.team1.players.length];
+//     const guessers = game.team2.players;
+//     const roundTime = game.roundTime;
 
-    io.to(gameId).emit("newTurn", { describer, guessers, roundTime });
-  } catch (error) {
-    console.error("Error handling timeUp event:", error);
-  }
-};
+//     io.to(gameId).emit("newTurn", { describer, guessers, roundTime });
+//   } catch (error) {
+//     console.error("Error handling timeUp event:", error);
+//   }
+// };
 
-
-const handleWordGuessed = async (io: Server, gameId: string, userId: string, points: number) => {
-  try {
-
-    await GameService.getInstance().updateUserScoreInMemory(userId, gameId, points);
-
-    // console.log(`Score updated for user ${userId} in game ${gameId}`);
-
-    io.to(gameId).emit("scoreUpdated", { userId, points });
-  } catch (error) {
-    console.error("Error handling wordGuessed event:", error);
-  }
-};
 
 const updateUsersWord = async (io: Server, gameId: string) => {
   io.to(gameId).emit("new-word");
 };
 
+const handleNewTurn = (io: Server, gameCode: string) => {
+  const playersData = {
+    team1: { describer: "Serhiy", guessers: ["Anton"] },
+    team2: { describer: "Piotr", guessers: ["Mikita"] },
+  };
+  io.to(gameCode).emit("newTurn", playersData);
+};
 
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
- 
-    socket.on("wordGuessed", (data: { gameId: string, userId: string, points: number }) => {
-      const { gameId, userId, points } = data;
-      handleWordGuessed(io, gameId, userId, points);
-    });
-    
+
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
+
+    socket.on("newTurn", (gameCode: string) => {
+      handleNewTurn(io, gameCode);
+    });
   });
-
-
 };
-

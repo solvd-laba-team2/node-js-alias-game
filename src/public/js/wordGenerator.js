@@ -27,7 +27,9 @@ const createNewWord = () => {
   });
 };
 
-socket.on("word-guessed", createNewWord);
+socket.on("wordGuessed", () => {
+  createNewWord();
+});
 
 button.addEventListener("click", (e) => {
   e.preventDefault();

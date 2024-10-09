@@ -57,9 +57,11 @@ const startTimer = () => {
 
 // Listen for new turn event to reset timer and update roles
 socket.on("newTurn", (data) => {
-  const { describer, guessers, roundTime } = data;
+  const { describer, guessers, roundTime } = data.team1;
+
   document.getElementById("describer").textContent = describer;
   document.getElementById("guessers").textContent = guessers.join(", ");
   timeLeft = roundTime || 60; // Reset timer for the new turn
   startTimer(); // Start the timer for the new turn
 });
+

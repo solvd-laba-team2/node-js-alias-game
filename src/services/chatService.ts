@@ -37,11 +37,38 @@ async function getChatHistory(gameId: string): Promise<IMessage[]> {
   return chat ? chat.messages : [];
 }
 
-export function checkGuesserMessage(gameId: string, message: string) {
+export const handleWordGuessed = async (
+  gameId: string,
+  userId: string,
+  points: number,
+) => {
+  try {
+    await GameService.getInstance().updateUserScoreInMemory(
+      userId,
+      gameId,
+      points,
+    );
+
+    // console.log(`Score updated for user ${userId} in game ${gameId}`);
+    SocketService.getInstance().emitToGameRoom(gameId, "scoreUpdated", {
+      userId,
+      points,
+    });
+  } catch (error) {
+    console.error("Error handling wordGuessed event:", error);
+  }
+};
+
+export function checkGuesserMessage(
+  gameId: string,
+  message: string,
+  user: string,
+) {
   const currentWord = GameService.getInstance().getCurrentWord(gameId);
   const socketService = SocketService.getInstance();
-  if (currentWord === message) {
-    socketService.emitToGameRoom(gameId, "word-guessed", {});
+  if (currentWord === message.toLowerCase()) {
+    handleWordGuessed(gameId, user, 2);
+    socketService.emitToGameRoom(gameId, "wordGuessed", {});
     socketService.emitToGameRoom(gameId, "systemMessage", "Correct!");
   }
   return false;
@@ -75,7 +102,7 @@ export const handleChatMessage = (messageData: MessageData) => {
   });
 
   // If user is not describer, so he is guesser
-  checkGuesserMessage(gameId, message);
+  checkGuesserMessage(gameId, message, user);
 };
 
 export default {
