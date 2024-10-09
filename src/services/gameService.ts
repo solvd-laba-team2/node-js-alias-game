@@ -2,7 +2,6 @@ import gameModel, { IGame } from "../models/gameModel";
 import userModel from "../models/userModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
-import { getOriginalId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 import GameLogicService from "./gameLogicService";
 import { getOriginalId } from "../utils/hash";
@@ -243,8 +242,7 @@ class GameService {
   }
 
   async generateWord(gameCode: string): Promise<string> {
-    const gameId = getOriginalId(gameCode);
-    const game = await this.getGame(gameId);
+    const game = await this.getGame(gameCode);
     const gameDifficulty = game.difficulty;
     const word = generateWord(difficultyWordOptions[gameDifficulty]);
     this.currentWords[gameCode] = word;

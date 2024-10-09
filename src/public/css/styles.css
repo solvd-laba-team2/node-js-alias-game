@@ -48,7 +48,6 @@ footer {
   position: relative;
   bottom: 0;
 }
-
 /* Navbar */
 .navbar {
   display: flex;
@@ -286,7 +285,6 @@ p {
   margin: 0 auto;
   color: #fff;
 }
-
 .alert-danger {
   background-color: #f44336;
   /* Red background */
@@ -301,7 +299,6 @@ p {
   text-align: center;
   margin: 20px 0;
 }
-
 .timer-box {
   font-size: 2em;
   font-weight: bold;
@@ -329,7 +326,6 @@ p {
 .game-list li:last-child {
   margin-bottom: 0px;
 }
-
 /* User Profile Styles */
 .profile-container {
   display: flex;
@@ -388,64 +384,6 @@ p {
   color: var(--main);
   font-weight: bold;
   margin-left: 5px;
-}
-
-
-.game-room {
-  display: flex;
-  justify-content: space-between;
-  padding: 20px;
-}
-
-.player-list-left,
-.player-list-right {
-  width: 15%;
-  background-color: #f9f9f9;
-  padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.player-list-left {
-  text-align: left;
-}
-
-.player-list-right {
-  text-align: right;
-}
-
-.center-content {
-  width: 65%;
-  padding: 0 20px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin: 10px 0;
-  font-size: 1.1em;
-  color: #333;
-}
-
-@media (max-width: 768px) {
-  .game-room {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .player-list-left,
-  .player-list-right {
-    width: 90%;
-    text-align: center;
-  }
-
-  .center-content {
-    width: 100%;
-    padding: 0;
-  }
 }
 
 .word-field {
@@ -585,3 +523,56 @@ button {
   gap: 10px;
 }
 
+.player-list-left,
+.player-list-right {
+  width: 15%;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+ 
+.game-room {
+  display: flex;
+  justify-content: space-between; /* Distribute space between team lists and center */
+  align-items: flex-start;
+  padding: 20px;
+  max-width: 1200px; /* Limit max width for readability */
+  margin: 0 auto;
+}
+
+.player-list-left, 
+.player-list-right {
+  width: 20%; /* Allocate space for the teams */
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.center-content {
+  width: 55%; /* Ensure center content takes the remaining space */
+  background-color: #fff;
+  padding: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 768px) {
+  .game-room {
+    flex-direction: column; /* Stack teams vertically on smaller screens */
+    align-items: center;
+  }
+
+  .player-list-left, 
+  .player-list-right, 
+  .center-content {
+    width: 100%; /* Full width for each section */
+    text-align: center; /* Center-align for readability */
+  }
+
+  .player-list-left,
+  .player-list-right {
+    margin-bottom: 20px; /* Add spacing between stacked elements */
+  }
+}

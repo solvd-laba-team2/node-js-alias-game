@@ -9,6 +9,7 @@ const playersList1 = document.getElementById("player-list1");
 const playersList2 = document.getElementById("player-list2");
 // Use data attributes to pass dynamic data
 const gameId = form.dataset.gameId;
+console.log(gameId);
 const currentUser = form.dataset.currentUser;
 const usersTeam = "";
 const team1 = { players: [] };
@@ -24,6 +25,9 @@ form.addEventListener("submit", (e) => {
   socket.emit("chatMessage", { message, ...data });
   input.value = "";
 });
+
+
+
 
 // Listen for chat messages from the server
 socket.on("userJoined", (data) => {
@@ -48,6 +52,12 @@ socket.on("userJoined", (data) => {
   });
 
 });
+
+socket.on("chatMessage", (data) => {
+  messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+});
+
 
 socket.on("systemMessage", (message) => {
   messages.innerHTML += `<p><strong>${message}</strong></p>`;

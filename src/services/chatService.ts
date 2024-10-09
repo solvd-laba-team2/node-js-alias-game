@@ -90,7 +90,7 @@ export const handleChatMessage = (messageData: MessageData) => {
 
   // Need to add check if user is describer, if so,
   // check if message is valid
-
+  
   SocketService.getInstance().emitToGameRoom(gameId, "chatMessage", {
     user,
     message,

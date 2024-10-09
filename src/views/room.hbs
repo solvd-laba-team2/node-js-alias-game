@@ -1,74 +1,87 @@
 <div class="game-room">
-  <div class="header">
-    <h2>Game Room - {{gameName}}</h2>
-    <button id="start-game" class="button">Start game</button>
+  <div class="player-list-left">
+    <h3>Team A</h3>
+    <ul id="player-list1"></ul>
   </div>
 
-  <!-- Display current round and timer -->
-  <div class="round-timer">
-    <div class="corner">
-      <div id="score-team1" class="timer-box">0</div>
-      <div id="roundCounter" class="timer-box">{{currentTurn}}
-        /
-        {{totalRounds}}</div>
+  <div class="center-content">
+    <div class="header">
+      <h2>Game Room - {{gameName}}</h2>
+      <button id="start-game" class="button">Start game</button>
     </div>
-    <div class="word-field">
-      <h1><img class="loading" src="/assets/loading60.gif" alt="" /></h1>
-      <button class="button small-btn">
-        <img
-          class="icon"
-          src="/assets/update-word.svg"
-          alt="Update"
-          width="24"
-          height="24"
+
+    <!-- Display current round and timer -->
+    <div class="round-timer">
+      <div class="corner">
+        <div id="score-team1" class="timer-box">0</div>
+        <div id="roundCounter" class="timer-box">{{currentTurn}}
+          /
+          {{totalRounds}}</div>
+      </div>
+      <div class="word-field">
+        <h1><img class="loading" src="/assets/loading60.gif" alt="" /></h1>
+        <button class="button small-btn">
+          <img
+            class="icon"
+            src="/assets/update-word.svg"
+            alt="Update"
+            width="24"
+            height="24"
+          />
+        </button>
+      </div>
+      <div class="corner">
+        <div id="score-team2" class="timer-box">0</div>
+        <div id="timer" class="timer-box">{{roundTime}}</div>
+      </div>
+    </div>
+
+    <!-- Word and update button -->
+
+    <!-- Display current roles -->
+    <div id="roles">
+      <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
+      <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
+    </div>
+
+    <!-- Section displaying team messages -->
+    <div class="chat-window">
+      <h3>Chat</h3>
+      <div class="chat-messages">
+        {{#each messages}}
+          <p><strong>{{this.username}}:</strong> {{this.message}}</p>
+        {{/each}}
+      </div>
+    </div>
+
+    <!-- Chat input -->
+    <div class="chat-input">
+      <form
+        id="chat-form"
+        data-game-id="{{gameName}}"
+        data-current-user="{{currentUser}}"
+      >
+        <input
+          id="message-input"
+          type="text"
+          name="message"
+          placeholder="Message..."
+          required
         />
-      </button>
-    </div>
-    <div class="corner">
-      <div id="score-team2" class="timer-box">0</div>
-      <div id="timer" class="timer-box">{{roundTime}}</div>
+        <input type="hidden" name="username" value="{{currentUser}}" />
+        <button class="button" type="submit">Send</button>
+      </form>
     </div>
   </div>
 
-  <!-- Word and update button -->
-
-  <!-- Display current roles -->
-  <div id="roles">
-    <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
-    <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
+  <div class="player-list-right">
+    <h3>Team B</h3>
+    <ul id="player-list2"></ul>
   </div>
-
-  <!-- Section displaying team messages -->
-  <div class="chat-window">
-    <h3>Chat</h3>
-    <div class="chat-messages">
-      {{#each messages}}
-        <p><strong>{{this.username}}:</strong> {{this.message}}</p>
-      {{/each}}
-    </div>
-  </div>
-
-  <!-- Chat input -->
-  <div class="chat-input">
-    <form
-      id="chat-form"
-      data-game-id="{{gameName}}"
-      data-current-user="{{currentUser}}"
-    >
-      <input
-        id="message-input"
-        type="text"
-        name="message"
-        placeholder="Message..."
-        required
-      />
-      <input type="hidden" name="username" value="{{currentUser}}" />
-      <button class="button" type="submit">Send</button>
-    </form>
-  </div>
-  <script src="/js/socket.io.js"></script>
-  <script src="/js/chat.js"></script>
-  <script src="/js/wordGenerator.js"></script>
-  <script src="/js/startGame.js"></script>
-  <script src="/js/score.js"></script>
 </div>
+
+<script src="/js/socket.io.js"></script>
+<script src="/js/chat.js"></script>
+<script src="/js/wordGenerator.js"></script>
+<script src="/js/startGame.js"></script>
+<script src="/js/score.js"></script>
