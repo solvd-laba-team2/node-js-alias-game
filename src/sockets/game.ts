@@ -27,7 +27,7 @@ const updateUsersWord = async (io: Server, gameId: string) => {
 
 const handleNewTurn = (io: Server, gameCode: string) => {
   const playersData = {
-    team1: { describer: "Serhiy", guessers: ["Anton"] },
+    team1: { describer: "Serhiy", guessers: ["Piotr"] },
     team2: { describer: "Piotr", guessers: ["Mikita"] },
   };
   io.to(gameCode).emit("newTurn", playersData);
