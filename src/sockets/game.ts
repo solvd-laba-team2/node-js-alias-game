@@ -10,15 +10,15 @@ import GameService from "../services/gameService";
 //       return;
 //     }
 
-//     const describer =
-//       game.team1.players[game.currentTurn % game.team1.players.length];
-//     const guessers = game.team2.players;
+    const describer = game.team1.players[game.currentTurn % game.team1.players.length];
+    const guessers = game.team2.players;
+    const roundTime = game.roundTime;
 
-//     io.to(gameId).emit("newTurn", { describer, guessers });
-//   } catch (error) {
-//     console.error("Error handling timeUp event:", error);
-//   }
-// };
+    io.to(gameId).emit("newTurn", { describer, guessers, roundTime });
+  } catch (error) {
+    console.error("Error handling timeUp event:", error);
+  }
+};
 
 
 const handleWordGuessed = async (io: Server, gameId: string, userId: string, points: number) => {

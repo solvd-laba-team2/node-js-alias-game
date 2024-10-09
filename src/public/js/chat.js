@@ -35,27 +35,31 @@ socket.on("newTurn", (data) => {
   console.log(`New describer: ${describer}, guessers: ${guessers}`);
 });
 
-let timeLeft = 60; // Start timer at 60 seconds
+let timeLeft = 60; // Default to 60 seconds, but this will be updated dynamically
 const timerElement = document.getElementById("timer");
+let timerInterval;
 
+// Function to start the timer
 const startTimer = () => {
-  const interval = setInterval(() => {
+  if (timerInterval) clearInterval(timerInterval); // Clear any existing interval to prevent multiple intervals
+
+  timerInterval = setInterval(() => {
     if (timeLeft <= 0) {
-      clearInterval(interval);
-      // Emit to the server that the time is up
-      socket.emit("timeUp", gameId);
+      clearInterval(timerInterval); // Stop the timer
+      socket.emit("timeUp", gameId); // Emit event to the server that the timer is up
     } else {
       timeLeft--;
-      timerElement.textContent = timeLeft;
+      timerElement.textContent = timeLeft; // Update the displayed time
     }
-  }, 1000);
+  }, 1000); // Update every second
 };
+
 
 // Listen for new turn event to reset timer and update roles
 socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
+  const { describer, guessers, roundTime } = data;
   document.getElementById("describer").textContent = describer;
   document.getElementById("guessers").textContent = guessers.join(", ");
-  timeLeft = 60; // Reset timer for the new turn
+  timeLeft = roundTime || 60; // Reset timer for the new turn
   startTimer(); // Start the timer for the new turn
 });

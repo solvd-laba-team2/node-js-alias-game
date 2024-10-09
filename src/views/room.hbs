@@ -1,9 +1,9 @@
 <div class="game-room">
-  <h2>Game Room - Chat for Game {{gameName}}</h2>
-
-  <!-- Display current roumd -->
-  <h3>Round:</h3>
-  <div id="timer" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
+    <h2>Game Room - Chat for Game {{gameName}}</h2>
+    
+    <!-- Display current roumd -->
+        <h3>Round:</h3>
+        <div id="roundCounter" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
 
   <!-- Timer for the current turn -->
   <div class="word-field">
@@ -60,6 +60,9 @@
       <button type="submit">Send</button>
     </form>
   </div>
+
+      <button onclick="startGame()">Start Game</button>
+    <button onclick="startTimer()">Start Timer</button>
   <script src="/js/socket.io.js"></script>
   <script src="/js/chat.js"></script>
   <script src="/js/wordGenerator.js"></script>
