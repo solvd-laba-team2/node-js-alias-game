@@ -390,6 +390,7 @@ p {
   margin-left: 5px;
 }
 
+
 .game-room {
   display: flex;
   justify-content: space-between;
@@ -446,3 +447,13 @@ li {
     padding: 0;
   }
 }
+
+.word-field {
+  height: 100px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+

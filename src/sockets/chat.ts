@@ -1,6 +1,9 @@
 import { Server, Socket } from "socket.io";
+
 import GameService from "../services/gameService";
 import GameLogicService from "../services/gameLogicService";
+import { handleJoinRoom, handleChatMessage } from "../services/chatService";
+import { JoinData, MessageData } from "../types/chatSocket.types";
 
 interface MessageData {
   message: string;
@@ -53,14 +56,16 @@ const handleChatMessage = (
   io.to(gameId).emit("chatMessage", { user, message, gameId });
 };
 
+
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     console.log("A user connected: " + socket.id);
 
     socket.on("join room", (data: JoinData) => handleJoinRoom(io, socket, data));
 
+
     socket.on("chatMessage", (messageData: MessageData) =>
-      handleChatMessage(io, socket, messageData),
+      handleChatMessage(messageData),
     );
 
     socket.on("disconnect", () => {
