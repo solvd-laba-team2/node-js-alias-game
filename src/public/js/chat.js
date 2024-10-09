@@ -33,6 +33,11 @@ swapTeamButton.addEventListener("click", () => {
 
 
 // Listen for chat messages from the server
+socket.on("chatMessage", (data) => {
+  messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+});
+
 socket.on("userJoined", (data) => {
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
