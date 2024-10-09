@@ -48,12 +48,6 @@ export const handleWordGuessed = async (
       gameId,
       points,
     );
-
-    // console.log(`Score updated for user ${userId} in game ${gameId}`);
-    SocketService.getInstance().emitToGameRoom(gameId, "scoreUpdated", {
-      userId,
-      points,
-    });
   } catch (error) {
     console.error("Error handling wordGuessed event:", error);
   }
@@ -85,7 +79,9 @@ export const handleJoinRoom = (socket: Socket, data: JoinData) => {
     "systemMessage",
     `User "${data.user}" has joined the room!`,
   );
+
   socketService.emitToGameRoom(data.gameId, "new-word", {});
+  socketService.emitToGameRoom(data.gameId, "scoreUpdated", {});
 };
 
 export const handleChatMessage = (messageData: MessageData) => {

@@ -516,3 +516,9 @@ button {
     max-height: 150px;
   }
 }
+
+.corner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
