@@ -1,8 +1,9 @@
 import gameModel, { IGame } from "../models/gameModel";
-import userModel from "../models/userModel"
+import userModel from "../models/userModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
 import GameLogicService from "./gameLogicService";
+import {getOriginalId} from "../utils/hash";
 
 class GameService {
   private socketService: SocketService;
@@ -103,9 +104,9 @@ async saveUserScoresToDatabase(gameId: string): Promise<void> {
         user.stats.wordsGuessed += score;  
         user.stats.gamesPlayed += 1;  
 
-        if (/* condition for winning */) {
-          user.stats.gamesWon += 1;
-        }
+        // if (/* condition for winning */) {
+        //   user.stats.gamesWon += 1;
+        // }
 
         await user.save();
   
@@ -118,24 +119,26 @@ async saveUserScoresToDatabase(gameId: string): Promise<void> {
 
 
 
-async startTurn(gameId: string): Promise<void> {
+async startTurn(gameId: string ): Promise<IGame | null> {
   let game = this.getActiveGame(gameId);
 
   if (!game) {
-    game = await gameModel.findById(gameId);
+    game = await gameModel.findById(getOriginalId(gameId));
     if (!game) throw new Error("Game not found");
   }
 
   const { describer, team } = GameLogicService.startTurn(game);
 
   if (!describer) {
-    await this.endGame(gameId);
+    await this.endGame(getOriginalId(gameId));
     return;
   }
 
+  const roundTime = game.roundTime;
   this.socketService.emitToGameRoom(gameId, "turnStarted", {
     describer,
-    team
+    team,
+    roundTime
   });
 
   this.updateGameState(game);

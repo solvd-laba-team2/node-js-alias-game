@@ -31,16 +31,25 @@ socket.on("systemMessage", (message) => {
 
 // Listen for new turn and role assignments
 socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
+  const { describer, guessers, roundTime } = data;
+  document.getElementById("describer").textContent = describer;
+  document.getElementById("guessers").textContent = guessers.join(", ");
   console.log(`New describer: ${describer}, guessers: ${guessers}`);
+  startTimer(+roundTime)
 });
+const startTurnButton = document.getElementById("start-turn-button");
 
-let timeLeft = 60; // Default to 60 seconds, but this will be updated dynamically
+// Add event listener to the button
+startTurnButton.addEventListener("click", () => {
+  const gameId = form.dataset.gameId; // Assuming you're getting the gameId dynamically
+  socket.emit("timeUp", gameId ); // Send the startTurn event with the gameId
+});
+//let timeLeft = 60; // Default to 60 seconds, but this will be updated dynamically
 const timerElement = document.getElementById("timer");
 let timerInterval;
 
 // Function to start the timer
-const startTimer = () => {
+const startTimer = (timeLeft) => {
   if (timerInterval) clearInterval(timerInterval); // Clear any existing interval to prevent multiple intervals
 
   timerInterval = setInterval(() => {
@@ -55,11 +64,3 @@ const startTimer = () => {
 };
 
 
-// Listen for new turn event to reset timer and update roles
-socket.on("newTurn", (data) => {
-  const { describer, guessers, roundTime } = data;
-  document.getElementById("describer").textContent = describer;
-  document.getElementById("guessers").textContent = guessers.join(", ");
-  timeLeft = roundTime || 60; // Reset timer for the new turn
-  startTimer(); // Start the timer for the new turn
-});
