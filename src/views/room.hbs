@@ -1,44 +1,61 @@
-<div class="game-room">
-    <h2>Game Room - Chat for Game {{gameName}}</h2>
-    
-    <!-- Display current roumd -->
+
+
+    <!-- Left column - Players list -->
+    <div class="player-list-left">
+        <h3>Team A</h3>
+        <ul id="player-list1">
+
+        </ul>
+    </div>
+
+    <!-- Center Content -->
+    <div class="center-content">
+        <h2>Game Room - Chat for Game {{gameName}}</h2>
+        <!-- Display current round -->
         <h3>Round:</h3>
         <div id="roundCounter" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
 
-    <!-- Timer for the current turn -->
-    <div class="timer-container">
-        <h3>Time Left:</h3>
-        <div id="timer" class="timer-box">{{roundTime}}</div>
-    </div>
+        <!-- Timer for the current turn -->
+        <div class="timer-container">
+            <h3>Time Left:</h3>
+            <div id="timer" class="timer-box">{{roundTime}}</div>
+        </div>
 
-    <!-- Display current describer and guessers -->
-    <div id="roles">
-        <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
-        <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
-    </div>
+        <!-- Display current describer and guessers -->
+        <div id="roles">
+            <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
+            <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
+        </div>
 
-    <!-- Section displaying team messages -->
-    <div class="chat-window">
-        <h3>Chat History</h3>
-        <div class="chat-messages">
-            {{#each messages}}
-            <p><strong>{{this.username}}:</strong> {{this.message}}</p>
-            {{/each}}
+        <!-- Section displaying team messages -->
+        <div class="chat-window">
+            <h3>Chat History</h3>
+            <div class="chat-messages">
+                {{#each messages}}
+                <p><strong>{{this.username}}:</strong> {{this.message}}</p>
+                {{/each}}
+            </div>
+        </div>
+
+        <!-- Chat input for the current user -->
+        <div class="chat-input">
+            <h4>Send a message as {{currentUser}}</h4>
+            <form id="chat-form" data-game-id="{{gameName}}" data-current-user="{{currentUser}}">
+                <input id="message-input" type="text" name="message" placeholder="Type your message..."
+                    autocomplete="off" required>
+                <input type="hidden" name="username" value="{{currentUser}}">
+                <button type="submit">Send</button>
+            </form>
         </div>
     </div>
 
-    <!-- Chat input for the current user -->
-    <div class="chat-input">
-        <h4>Send a message as {{currentUser}}</h4>
-        <form id="chat-form" data-game-id="{{gameName}}" data-current-user="{{currentUser}}">
-            <input id="message-input" type="text" name="message" placeholder="Type your message..." autocomplete="off" required>
-            <input type="hidden" name="username" value="{{currentUser}}">
-            <button type="submit">Send</button>
-        </form>
+    <!-- Right column - Players list -->
+    <div class="player-list-right">
+        <h3>Team B</h3>
+        <ul id="player-list2">
+
+        </ul>
     </div>
 
-      <button onclick="startGame()">Start Game</button>
-    <button onclick="startTimer()">Start Timer</button>
     <script src="/js/socket.io.js"></script>
     <script src="/js/chat.js"></script>
-</div>

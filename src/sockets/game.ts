@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
 import GameService from "../services/gameService";
 
-const handleTimeUp = async (io: Server, gameId: string) => {
+const handleTimeUp = async (io: Server, gameId: string) => { // needs fixes
   try {
     const game = await GameService.getInstance().startTurn(gameId);
 
@@ -34,14 +34,23 @@ const handleWordGuessed = async (io: Server, gameId: string, userId: string, poi
   }
 };
 
+const updateUsersWord = async (io: Server, gameId: string) => {
+  io.to(gameId).emit("new-word");
+};
+
+
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
-    socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId));
+
+    // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
  
+
     socket.on("wordGuessed", (data: { gameId: string, userId: string, points: number }) => {
       const { gameId, userId, points } = data;
       handleWordGuessed(io, gameId, userId, points);
     });
+    
+    socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
   });
 
 

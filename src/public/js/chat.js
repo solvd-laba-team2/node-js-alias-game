@@ -4,10 +4,17 @@ const chatWindow = document.querySelector(".chat-window");
 const messages = document.querySelector(".chat-messages");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message-input");
+
+const playersList1 = document.getElementById("player-list1");
+const playersList2 = document.getElementById("player-list2");
 // Use data attributes to pass dynamic data
 const gameId = form.dataset.gameId;
 const currentUser = form.dataset.currentUser;
-const data = { gameId, user: currentUser };
+const usersTeam = "";
+const team1 = { players: [] };
+const team2 = { players: [] };
+
+const data = { gameId, user: currentUser, usersTeam, team1, team2 };
 
 socket.emit("join room", data);
 
@@ -19,9 +26,27 @@ form.addEventListener("submit", (e) => {
 });
 
 // Listen for chat messages from the server
-socket.on("chatMessage", (data) => {
-  messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+socket.on("userJoined", (data) => {
+  messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  playersList1.innerHTML = '';
+  playersList2.innerHTML = '';
+
+  // Populate team1 players
+  data.team1.players.forEach(player => {
+    const li = document.createElement('li');
+    li.textContent = player;
+    playersList1.appendChild(li);
+  });
+
+  // Populate team2 players
+  data.team2.players.forEach(player => {
+    const li = document.createElement('li');
+    li.textContent = player;
+    playersList2.appendChild(li);
+  });
+
 });
 
 socket.on("systemMessage", (message) => {
