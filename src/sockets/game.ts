@@ -36,7 +36,7 @@ const handleWordGuessed = async (io: Server, gameId: string, userId: string, poi
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId));
- 
+
     socket.on("wordGuessed", (data: { gameId: string, userId: string, points: number }) => {
       const { gameId, userId, points } = data;
       handleWordGuessed(io, gameId, userId, points);

@@ -3,7 +3,7 @@
     <!-- Left column - Players list -->
     <div class="player-list-left">
         <h3>Team A</h3>
-        <ul id="player-listA">
+        <ul id="player-list1">
 
         </ul>
     </div>
@@ -40,8 +40,7 @@
         <!-- Chat input for the current user -->
         <div class="chat-input">
             <h4>Send a message as {{currentUser}}</h4>
-            <form id="chat-form" data-game-id="{{gameName}}" data-current-user="{{currentUser}}" data-team-A="{{team1}}"
-                data-team-B="{{team2}}">
+            <form id="chat-form" data-game-id="{{gameName}}" data-current-user="{{currentUser}}">
                 <input id="message-input" type="text" name="message" placeholder="Type your message..."
                     autocomplete="off" required>
                 <input type="hidden" name="username" value="{{currentUser}}">
@@ -53,7 +52,7 @@
     <!-- Right column - Players list -->
     <div class="player-list-right">
         <h3>Team B</h3>
-        <ul id="player-listB">
+        <ul id="player-list2">
 
         </ul>
     </div>
