@@ -2,7 +2,8 @@ import Chat, { IChat, IMessage } from "../models/chatModel";
 import GameService from "./gameService";
 import SocketService from "./socketService";
 import { JoinData, MessageData } from "../types/chatSocket.types";
-import { Socket } from "socket.io";
+import { Server, Socket } from "socket.io";
+import GameLogicService from "./gameLogicService";
 
 // Create or retrieve chat by gameId
 async function getOrCreateChat(gameId: string): Promise<IChat | null> {
@@ -47,18 +48,47 @@ export function checkGuesserMessage(gameId: string, message: string) {
   return false;
 }
 
-export const handleJoinRoom = (socket: Socket, data: JoinData) => {
-  socket.join(data.gameId);
-  console.log(data);
-  console.log(`User ${data.user} joined room: ${data.gameId}`);
-  const socketService = SocketService.getInstance();
 
-  socketService.emitToGameRoom(
-    data.gameId,
-    "systemMessage",
-    `User "${data.user}" has joined the room!`,
-  );
-  socketService.emitToGameRoom(data.gameId, "new-word", {});
+export const handleSwapTeam = async (io: Server, socket: Socket, data: JoinData) => {
+  const game = await GameService.getInstance().getGame(data.gameId);
+
+  if (game.team1.players.includes(data.user)) {
+    await GameService.getInstance().addUser(data.gameId, "team2", data.user);
+    await GameService.getInstance().rmUser(data.gameId, "team1", data.user);
+  } else {
+    await GameService.getInstance().addUser(data.gameId, "team1", data.user);
+    await GameService.getInstance().rmUser(data.gameId, "team2", data.user);
+  }
+
+  const updatedGame = await GameService.getInstance().getGame(data.gameId);
+  data.usersTeam = game.team1.players.includes(data.user) ? "team1" : "team2";
+  data.team1.players = updatedGame.team1.players;
+  data.team2.players = updatedGame.team2.players;
+
+
+  console.log(data);
+  io.to(data.gameId).emit("userJoined", data);
+};
+export const handleJoinRoom = async (io: Server, socket: Socket, data: JoinData) => {
+  socket.join(data.gameId);
+  console.log(`User ${data.user} joined room: ${data.gameId}`);
+
+  const game = await GameService.getInstance().getGame(data.gameId);
+
+  if (!(game.team1.players.includes(data.user) || game.team2.players.includes(data.user))) {
+    const team = GameLogicService.getRandomTeam();
+    data.usersTeam = team;
+    await GameService.getInstance().addUser(data.gameId, team, data.user);
+  } else {
+    data.usersTeam = game.team1.players.includes(data.user) ? "team1" : "team2";
+  }
+
+  const updatedGame = await GameService.getInstance().getGame(data.gameId);
+  data.team1.players = updatedGame.team1.players;
+  data.team2.players = updatedGame.team2.players;
+
+  console.log(data);
+  io.to(data.gameId).emit("userJoined", data);
 };
 
 export const handleChatMessage = (messageData: MessageData) => {
@@ -83,4 +113,5 @@ export default {
   addMessageToChat,
   getChatHistory,
   handleChatMessage,
+  handleJoinRoom
 };

@@ -173,6 +173,17 @@ export const joinGame = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+//endpoint to get teams
+export const getTeams = async (req: Request, res: Response) => {
+  const { gameCode } = req.body;
+  try {
+    const game = await GameService.getInstance().getGame(gameCode);
+    const teams = { team1: game.team1.players, team2: game.team2.players };
+    res.status(200).json(teams);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 export default {
   renderCreateGameForm,
@@ -187,4 +198,5 @@ export default {
   renderRoomPage,
   getGenerateWord,
   getCurrentWord,
+  getTeams
 };

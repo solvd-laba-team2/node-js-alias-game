@@ -1,11 +1,8 @@
-
-
+<div class="game-room">
     <!-- Left column - Players list -->
     <div class="player-list-left">
         <h3>Team A</h3>
-        <ul id="player-list1">
-
-        </ul>
+        <ul id="player-list1"></ul>
     </div>
 
     <!-- Center Content -->
@@ -26,6 +23,8 @@
             <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
             <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
         </div>
+
+        <button id="swap-team-button" class="button">Swap Team</button>
 
         <!-- Section displaying team messages -->
         <div class="chat-window">
@@ -52,10 +51,10 @@
     <!-- Right column - Players list -->
     <div class="player-list-right">
         <h3>Team B</h3>
-        <ul id="player-list2">
-
-        </ul>
+        <ul id="player-list2"></ul>
     </div>
+</div>
 
-    <script src="/js/socket.io.js"></script>
-    <script src="/js/chat.js"></script>
+
+<script src="/js/socket.io.js"></script>
+<script src="/js/chat.js"></script>
