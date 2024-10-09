@@ -394,3 +394,125 @@ p {
   justify-content: center;
   padding: 10px;
 }
+
+/* Overall adjustments */
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--light-bg);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Compact the game room layout */
+.game-room {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.header,
+.round-timer,
+.word-field,
+.chat-input,
+.chat-window,
+#roles {
+  margin-bottom: 10px;
+}
+
+/* Reduced padding and margin for elements */
+button {
+  padding: 5px 15px;
+  margin: 5px 0;
+}
+
+.round-timer,
+.word-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.round-info,
+.timer-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.round-info h3,
+.timer-info h3 {
+  font-size: 1em;
+  margin: 5px 0;
+}
+
+/* Reduce word field size */
+.word-field {
+  height: 70px;
+  justify-content: center;
+}
+
+.small-btn {
+  padding: 5px;
+  height: 40px;
+  width: 40px;
+}
+
+/* Chat window adjustments */
+.chat-window {
+  background-color: #eee;
+  padding: 10px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.chat-input {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+#message-input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+}
+
+.chat-input button {
+  padding: 5px 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .game-room {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .round-info h3,
+  .timer-info h3 {
+    font-size: 0.9em;
+  }
+
+  button {
+    padding: 5px 10px;
+  }
+
+  .chat-window {
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .round-info h3,
+  .timer-info h3 {
+    font-size: 0.8em;
+  }
+
+  .chat-window {
+    max-height: 150px;
+  }
+}
