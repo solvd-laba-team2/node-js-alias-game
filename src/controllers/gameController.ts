@@ -27,7 +27,7 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     return res.render("room", errorOptions);
   }
 
-  const game = await GameService.getInstance().getGame(id);
+  const game = await GameService.getInstance().getGame(gameId);
 
   if (!game) {
     return res.render("room", errorOptions);
@@ -93,7 +93,7 @@ export const createGame = async (req: Request, res: Response) => {
       gameName,
       difficulty,
       roundTime,
-      totalRounds,
+      totalRounds
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
     res.redirect(`/game/${shortId}`);
@@ -177,8 +177,7 @@ export const renderJoinGamePage = async (req: Request, res: Response) => {
 export const joinGame = async (req: Request, res: Response) => {
   const { gameCode } = req.body;
   try {
-    const originalId = getOriginalId(gameCode);
-    const game = GameService.getInstance().getGame(originalId);
+    const game = GameService.getInstance().getGame(gameCode);
     const games = await GameService.getInstance().getOnlyNotStartedGames();
     if (!game) {
       res.render("join-game", {

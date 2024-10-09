@@ -35,6 +35,7 @@ const handleNewTurn = (io: Server, gameCode: string) => {
 
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
+
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
 
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
