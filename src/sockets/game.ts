@@ -41,8 +41,10 @@ const updateUsersWord = async (io: Server, gameId: string) => {
 
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
+
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
  
+
     socket.on("wordGuessed", (data: { gameId: string, userId: string, points: number }) => {
       const { gameId, userId, points } = data;
       handleWordGuessed(io, gameId, userId, points);
