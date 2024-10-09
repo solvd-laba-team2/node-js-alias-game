@@ -56,6 +56,7 @@ socket.on("systemMessage", (message) => {
 
 // Listen for new turn and role assignments
 socket.on("newTurn", (data) => {
+
   const { describer, guessers, roundTime } = data;
   document.getElementById("describer").textContent = describer;
   document.getElementById("guessers").textContent = guessers.join(", ");
@@ -67,6 +68,7 @@ const startTurnButton = document.getElementById("start-turn-button");
 // Add event listener to the button
 startTurnButton.addEventListener("click", () => {
   const gameId = form.dataset.gameId; // Assuming you're getting the gameId dynamically
+  console.log(gameId)
   socket.emit("timeUp", gameId ); // Send the startTurn event with the gameId
 });
 //let timeLeft = 60; // Default to 60 seconds, but this will be updated dynamically
