@@ -5,7 +5,6 @@ import SocketService from "../services/socketService";
 import { getOriginalId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 import GameLogicService from "./gameLogicService";
-import { getOriginalId } from "../utils/hash";
 
 class GameService {
   private socketService: SocketService;
