@@ -47,7 +47,7 @@ const updateUsersWord = (gameId: string) => {
   socketService.emitToGameRoom(gameId, "new-word", {});
 };
 
-const startTimer = (gameCode: string, seconds: number, totalRounds: number) => {
+const startTimer = async (gameCode: string, seconds: number, totalRounds: number) => {
   let roundsLeft = totalRounds;
   const initialTime = seconds;
   const socketService = SocketService.getInstance();
@@ -63,6 +63,7 @@ const startTimer = (gameCode: string, seconds: number, totalRounds: number) => {
         updateUsersWord(gameCode);
       } else {
         clearInterval(timerInterval); // Stop the interval when no rounds are left
+        await GameService.getInstance().endGame(gameCode);
         socketService.emitToGameRoom(gameCode, "endGame", {});
         return;
       }
@@ -79,7 +80,7 @@ export default (io: Server) => {
     socket.on("startGame", async (gameCode: string, seconds: number, totalRounds: number) => {
       await GameService.getInstance().switchTurn(gameCode);
       io.to(gameCode).emit("startGame");
-      io.to(gameCode).emit("blockButtons");
+      // io.to(gameCode).emit("blockButtons");
       startTimer(gameCode, seconds, totalRounds);
     });
 

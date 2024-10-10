@@ -14,6 +14,9 @@ const gameId = form.dataset.gameId;
 const currentUser = form.dataset.currentUser;
 
 const totalRounds = parseInt(form.dataset.totalRounds);
+
+const gameStatus = form.dataset.gameStatus;
+
 // const roundTime = parseInt(form.dataset.roundTime);
 const roundTime = 5;
 
@@ -63,6 +66,7 @@ socket.on("chatMessage", (data) => {
 });
 
 socket.on("userJoined", (data) => {
+  console.log("gameStatus", gameStatus);
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
@@ -115,10 +119,12 @@ socket.on("newTurn", (currentRound) => {
 
 socket.on("startGame", () => {
   console.log("startGame event");
+  blockControlButtons();
   loadCurrentTurn();
   // startTimer(roundTime);
 });
 
 socket.on("endGame", () => {
   console.log("Trigger end game");
+  window.location.reload();
 });

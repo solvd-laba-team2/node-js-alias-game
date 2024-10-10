@@ -132,10 +132,10 @@ class GameService {
     return { team1: team1Score, team2: team2Score };
   }
 
-  async saveUserScoresToDatabase(gameId: string): Promise<void> {
-    const game = this.getActiveGame(gameId);
+  async saveUserScoresToDatabase(gameCode: string): Promise<void> {
+    const game = await this.getGame(gameCode);
     if (!game) throw new Error("Game not found");
-    const currentGameScores = this.userScores[gameId] || {};
+    const currentGameScores = this.userScores[gameCode] || {};
     // Iterate over both teams and save user scores to the database
     for (const team of [game.team1, game.team2]) {
       for (const player of team.players) {
@@ -150,10 +150,11 @@ class GameService {
           }
 
           await user.save();
-
-          delete this.userScores[gameId][player];
         }
       }
+    }
+    if (this.userScores[gameCode]) {
+      delete this.userScores[gameCode];
     }
   }
 
@@ -183,19 +184,15 @@ class GameService {
     return game;
   }
 
-  async endGame(gameId: string): Promise<void> {
-    const game = this.getActiveGame(gameId);
+  async endGame(gameCode: string): Promise<void> {
+    const game = await this.getGame(gameCode);
 
     if (!game) throw new Error("Game not found");
 
     game.status = "finished";
+    await game.save();
 
-    await this.saveUserScoresToDatabase(gameId);
-    this.activeGames.delete(gameId);
-
-    this.socketService.emitToGameRoom(gameId, "gameEnded", {
-      message: "The game has ended!",
-    });
+    await this.saveUserScoresToDatabase(gameCode);
   }
 
   // Add a message to the game's chat

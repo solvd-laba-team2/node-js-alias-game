@@ -46,6 +46,7 @@ export const renderRoomPage = async (req: Request, res: Response) => {
     currentTurn: game.currentTurn,
     roundTime: game.roundTime,
     totalRounds: game.totalRounds,
+    status: game.status
   });
 };
 
@@ -178,7 +179,7 @@ export const joinGame = async (req: Request, res: Response) => {
     if (!game) {
       res.render("join-game", {
         games,
-        errorMessage: "No game with such passcode!",
+        errorMessage: "No game with such code!",
       });
     } else {
       res.redirect(`/game/${gameCode}`);
@@ -219,6 +220,7 @@ export const getTurn = async (req: Request, res: Response) => {
   }
   res.status(200).json(currentTurnData);
 };
+
 
 export default {
   renderCreateGameForm,
