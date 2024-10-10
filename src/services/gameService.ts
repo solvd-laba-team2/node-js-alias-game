@@ -253,16 +253,16 @@ class GameService {
     const game = await this.getGame(gameCode);
     const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
 
-    const game2 = {
-      team1:{
-        players: ["Sehiy", "Andrew", "John"]
-      },
-      team2:{
-        players: ["Mathew", "Marcus", "Pablo"]
-      }
-    };
+    // const game2 = { // For testing purposes
+    //   team1:{
+    //     players: ["Sehiy", "Andrew", "John"]
+    //   },
+    //   team2:{
+    //     players: ["Mathew", "Marcus", "Pablo"]
+    //   }
+    // };
 
-    const currentPlayers = game2[currentTeam].players;
+    const currentPlayers = game[currentTeam].players;
 
     const previousTurn = this.gamesTurns[gameCode] || null;
 

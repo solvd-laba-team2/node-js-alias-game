@@ -22,7 +22,9 @@ socket.emit("join room", data);
 form.addEventListener("submit", (e) => {
   e.preventDefault(); // Prevent the page from refreshing
   const message = input.value;
-  socket.emit("chatMessage", { message, ...data });
+  if (message !== "") {
+    socket.emit("chatMessage", { message, ...data });
+  }
   input.value = "";
 });
 
@@ -82,10 +84,13 @@ const startTimer = () => {
   }, 1000);
 };
 
-
 let describer;
 let guessers;
 let currentTeam;
+
+const disableChat = () => {
+  document.querySelector("#message-input").disabled = true;
+};
 
 const switchTurn = () => {
   const request = fetch(window.location.href + "/switchTurn");
@@ -94,6 +99,14 @@ const switchTurn = () => {
       response.json().then((data) => {
         describer = data.describer;
         guessers = data.guessers;
+        if (guessers.includes(currentUser)) {
+          hideWordField();
+        } else if (
+          currentUser !== describer &&
+          !guessers.includes(currentUser)
+        ) {
+          disableChat();
+        }
         currentTeamTurn = data.currentTeam;
         document.getElementById("describer").textContent = describer;
         document.getElementById("guessers").textContent = guessers.join(", ");
@@ -102,8 +115,8 @@ const switchTurn = () => {
   });
 };
 
-hideWordField = () => {
-  
+const hideWordField = () => {
+  document.querySelector(".word-field").style.display = "none";
 };
 
 // Listen for new turn event to reset timer and update roles
