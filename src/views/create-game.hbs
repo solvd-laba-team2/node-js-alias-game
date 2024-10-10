@@ -1,0 +1,39 @@
+<h1>Create a New Game</h1>
+<p>Set up a new Alias game by choosing a name, the number of players, and difficulty level.</p>
+
+<form action="/game/create" method="POST">
+  <div>
+    <label for="game-name">Game Name:</label>
+    <input type="text" id="game-name" name="gameName" placeholder="Enter game name" required />
+  </div>
+
+  <div>
+    <label for="players">Number of Players:</label>
+    <input type="number" id="players" name="players" min="4" max="10" value="4" required />
+  </div>
+
+  <div>
+    <label for="difficulty">Difficulty Level:</label>
+    <select id="difficulty" name="difficulty">
+      <option value="easy">Easy</option>
+      <option value="medium">Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="round-time">Time for each round:</label>
+    <select id="round-time" name="roundTime">
+      <option value="60">60 seconds</option>
+      <option value="90">90 seconds</option>
+      <option value="120">120 seconds</option>
+    </select>
+  </div>
+
+  <div>
+    <label for="total-rounds">Number of rounds:</label>
+    <input type="number" id="total-rounds" name="totalRounds" min="1" max="10" value="5" required />
+  </div>
+
+  <button type="submit" class="button">Create Game</button>
+</form>

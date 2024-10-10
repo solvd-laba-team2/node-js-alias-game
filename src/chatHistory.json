@@ -1,0 +1,92 @@
+{
+  "games": {
+    "456": {
+      "chatHistory": [
+        {
+          "username": "Alice",
+          "message": "wazzup"
+        }
+      ]
+    },
+    "asd12": {
+      "chatHistory": [
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "adsadsq"
+        },
+        {
+          "username": "Alice",
+          "message": "asdasdads"
+        },
+        {
+          "username": "Alice",
+          "message": "qwe"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "123123"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "qeweqwasd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "qwe"
+        },
+        {
+          "username": "Alice",
+          "message": "ad"
+        },
+        {
+          "username": "Alice",
+          "message": "asdads"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd"
+        },
+        {
+          "username": "Alice",
+          "message": "asd12"
+        }
+      ]
+    }
+  }
+}

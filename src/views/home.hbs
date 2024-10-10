@@ -1,0 +1,13 @@
+<h1>Welcome to the Alias Game!</h1>
+<p>Join us and play the word-guessing game with your friends.</p>
+
+{{#if isAuthenticated}}
+<div class="game-options">
+  <a href="/game/create" class="button">Create a New Game</a>
+  <a href="/game/join" class="button">Join Existing Game</a>
+{{else}}
+  <div class="auth-buttons">
+    <a href="/login" class="button">Login</a>
+    <a href="/register" class="button">Register</a>
+  </div>
+{{/if}}

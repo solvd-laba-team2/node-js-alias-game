@@ -1,0 +1,30 @@
+<h1>Join an Existing Game</h1>
+<p>Choose a game from the list below to join or ask for a code to the game and start playing with your
+  friends!</p>
+
+
+{{#if errorMessage}}
+<div class="alert alert-danger">
+  {{errorMessage}}
+</div>
+{{/if}}
+<form method="post" action="/game/join">
+  <div class="game-code-input">
+    <label for="gameCode">Put your code down here:</label>
+    <input type="text" id="game-code" name="gameCode">
+    <button type="submit" class="button">Join</button>
+  </div>
+</form>
+
+<div class="game-list">
+  <ul>
+    {{#each games}}
+    <li>Game - {{this.gameName}}<a href="/game/{{shorten this._id}}" class="button">Join</a></li>
+    {{else}}
+    <li>No games available</li>
+    {{/each}}
+  </ul>
+</div>
+
+<script src="/js/socket.io.js"></script>
+<script src="/js/joining-room.js"></script>
