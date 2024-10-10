@@ -71,11 +71,12 @@ socket.on("systemMessage", (message) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
-
-
-
 const disableChat = () => {
   document.querySelector("#message-input").disabled = true;
+};
+
+const enableChat = () => {
+  document.querySelector("#message-input").disabled = false;
 };
 
 const loadCurrentTurn = () => {
@@ -85,12 +86,15 @@ const loadCurrentTurn = () => {
       response.json().then((data) => {
         describer = data.describer;
         guessers = data.guessers;
+
         if (guessers.includes(currentUser)) {
           hideWordField();
-        } else if (
-          currentUser !== describer &&
-          !guessers.includes(currentUser)
-        ) {
+          enableChat();
+        } else if (currentUser === describer) {
+          showWordField();
+          enableChat();
+        } else {
+          showWordField();
           disableChat();
         }
         currentTeamTurn = data.currentTeam;
@@ -113,10 +117,12 @@ const switchTurn = () => {
         guessers = data.guessers;
         if (guessers.includes(currentUser)) {
           hideWordField();
-        } else if (
-          currentUser !== describer &&
-          !guessers.includes(currentUser)
-        ) {
+          enableChat();
+        } else if (currentUser === describer) {
+          showWordField();
+          enableChat();
+        } else {
+          showWordField();
           disableChat();
         }
         currentTeamTurn = data.currentTeam;
@@ -131,9 +137,13 @@ const hideWordField = () => {
   document.querySelector(".word-field").style.display = "none";
 };
 
+const showWordField = () => {
+  document.querySelector(".word-field").style.display = "flex";
+};
+
 // Listen for new turn event to reset timer and update roles
 socket.on("newTurn", () => {
+  console.log("newTurn event");
   switchTurn();
-  timeLeft = 60; // Reset timer for the new turn
-  startTimer(); // Start the timer for the new turn
+  startTimer(3);
 });

@@ -63,13 +63,17 @@ export default (io: Server) => {
 
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
 
-    socket.on("startTimer", (gameId: string, seconds: number) => {
+    socket.on("startTimer", (gameCode: string, seconds: number) => {
+      console.log("Starting timer");
       const timerInterval = setInterval(() => {
-        if (seconds < 0) {
-          return clearInterval(timerInterval);
+        if (seconds <= 0) {
+          io.to(gameCode).emit("newTurn");
+          clearInterval(timerInterval);
+          return; // Ensure no further code is executed
+        } else {
+          io.to(gameCode).emit("timerTick", seconds);
+          seconds--;
         }
-        io.to(gameId).emit("timerTick",  seconds);
-        seconds--;
       }, 1000);
     });
   });

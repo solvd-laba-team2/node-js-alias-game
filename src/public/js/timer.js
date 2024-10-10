@@ -3,7 +3,7 @@
 let timeLeft = 60; // Start timer at 60 seconds
 const timerElement = document.getElementById("timer");
 
-const startTimer = (seconds = 60) => {
+const startTimer = (seconds = 3) => {
   socket.emit("startTimer", gameId, seconds);
 };
 
