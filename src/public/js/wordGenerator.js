@@ -9,6 +9,7 @@ socket.on("new-word", () => {
       response.json().then(({ word }) => {
         if (word) {
           wordField.innerText = word;
+          targetWord = word;
         }
       });
     }

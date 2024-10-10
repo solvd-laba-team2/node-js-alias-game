@@ -49,6 +49,7 @@ export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
     socket.on("newTurn", (gameCode) => {
+      GameService.getInstance().switchTurn(gameCode);
       io.to(gameCode).emit("newTurn");
       io.to(gameCode).emit("blockButtons");
     });

@@ -4,6 +4,7 @@ import SocketService from "./socketService";
 import { JoinData, MessageData } from "../types/chatSocket.types";
 import { Server, Socket } from "socket.io";
 import GameLogicService from "./gameLogicService";
+import { isMessageValid } from "../utils/wordCheck";
 
 // Create or retrieve chat by gameId
 async function getOrCreateChat(gameId: string): Promise<IChat | null> {
@@ -125,12 +126,20 @@ export const handleJoinRoom = async (
   io.to(data.gameId).emit("scoreUpdated", data);
   io.to(data.gameId).emit("new-word");
 };
+
 export const handleChatMessage = (messageData: MessageData) => {
-  const { message, gameId, user } = messageData;
+  const { message, gameId, user, role, targetWord } = messageData;
   console.log("Message received:", messageData);
 
   // Need to add check if user is describer, if so,
   // check if message is valid
+  if (role === "describer") {
+    const { validation } = isMessageValid(message, targetWord);
+    if (!validation) {
+      console.log("not ok");
+      return;
+    }
+  }
 
   SocketService.getInstance().emitToGameRoom(gameId, "chatMessage", {
     user,
@@ -138,8 +147,10 @@ export const handleChatMessage = (messageData: MessageData) => {
     gameId,
   });
 
-  // If user is not describer, so he is guesser
-  checkGuesserMessage(gameId, message, user);
+  if (role === "guesser") {
+    // If user is not describer, so he is guesser
+    checkGuesserMessage(gameId, message, user);
+  }
 };
 
 export default {

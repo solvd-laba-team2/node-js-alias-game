@@ -21,13 +21,26 @@ let describer;
 let guessers;
 let currentTeam;
 
+let targetWord;
+
 socket.emit("join room", data);
 
 form.addEventListener("submit", (e) => {
   e.preventDefault(); // Prevent the page from refreshing
+  let role;
+  if (!describer) {
+    role = "unknown"; // game has not started
+  } else {
+    role = currentUser === describer ? "describer" : "guesser";
+  }
   const message = input.value;
   if (message !== "") {
-    socket.emit("chatMessage", { message, ...data });
+    socket.emit("chatMessage", {
+      message,
+      ...data,
+      role,
+      targetWord: targetWord || null,
+    });
   }
   input.value = "";
 });
@@ -71,68 +84,6 @@ socket.on("systemMessage", (message) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
-const disableChat = () => {
-  document.querySelector("#message-input").disabled = true;
-};
-
-const enableChat = () => {
-  document.querySelector("#message-input").disabled = false;
-};
-
-const loadCurrentTurn = () => {
-  const request = fetch(window.location.href + "/getTurn");
-  request.then((response) => {
-    if (response.ok === true) {
-      response.json().then((data) => {
-        describer = data.describer;
-        guessers = data.guessers;
-
-        if (guessers.includes(currentUser)) {
-          hideWordField();
-          enableChat();
-        } else if (currentUser === describer) {
-          showWordField();
-          enableChat();
-        } else {
-          showWordField();
-          disableChat();
-        }
-        currentTeamTurn = data.currentTeam;
-        document.getElementById("describer").textContent = describer;
-        document.getElementById("guessers").textContent = guessers.join(", ");
-      });
-    } else {
-      showElement(startButton);
-      showElement(swapTeamButton);
-    }
-  });
-};
-
-const switchTurn = () => {
-  const request = fetch(window.location.href + "/switchTurn");
-  request.then((response) => {
-    if (response.ok === true) {
-      response.json().then((data) => {
-        describer = data.describer;
-        guessers = data.guessers;
-        if (guessers.includes(currentUser)) {
-          hideWordField();
-          enableChat();
-        } else if (currentUser === describer) {
-          showWordField();
-          enableChat();
-        } else {
-          showWordField();
-          disableChat();
-        }
-        currentTeamTurn = data.currentTeam;
-        document.getElementById("describer").textContent = describer;
-        document.getElementById("guessers").textContent = guessers.join(", ");
-      });
-    }
-  });
-};
-
 const hideWordField = () => {
   document.querySelector(".word-field").style.display = "none";
 };
@@ -144,6 +95,6 @@ const showWordField = () => {
 // Listen for new turn event to reset timer and update roles
 socket.on("newTurn", () => {
   console.log("newTurn event");
-  switchTurn();
-  startTimer(3);
+  loadCurrentTurn();
+  startTimer(30);
 });
