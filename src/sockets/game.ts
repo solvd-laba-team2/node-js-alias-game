@@ -20,11 +20,18 @@ import GameService from "../services/gameService";
 //   }
 // };
 
-
-const handleWordGuessed = async (io: Server, gameId: string, userId: string, points: number) => {
+const handleWordGuessed = async (
+  io: Server,
+  gameId: string,
+  userId: string,
+  points: number,
+) => {
   try {
-
-    await GameService.getInstance().updateUserScoreInMemory(userId, gameId, points);
+    await GameService.getInstance().updateUserScoreInMemory(
+      userId,
+      gameId,
+      points,
+    );
 
     // console.log(`Score updated for user ${userId} in game ${gameId}`);
 
@@ -38,21 +45,25 @@ const updateUsersWord = async (io: Server, gameId: string) => {
   io.to(gameId).emit("new-word");
 };
 
-
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
-
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
- 
-
-    socket.on("wordGuessed", (data: { gameId: string, userId: string, points: number }) => {
-      const { gameId, userId, points } = data;
-      handleWordGuessed(io, gameId, userId, points);
+    socket.on("newTurn", (gameCode) => {
+      const describer = "Serhiy";
+      const guessers = ["Ivan", "John"];
+      const data = { describer, guessers };
+      io.to(gameCode).emit("newTurn", data);
+      io.to(gameCode).emit("blockButtons");
     });
-    
+
+    socket.on(
+      "wordGuessed",
+      (data: { gameId: string; userId: string; points: number }) => {
+        const { gameId, userId, points } = data;
+        handleWordGuessed(io, gameId, userId, points);
+      },
+    );
+
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
   });
-
-
 };
-
