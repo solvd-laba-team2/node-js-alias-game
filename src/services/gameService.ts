@@ -249,26 +249,55 @@ class GameService {
     this.currentWords[gameCode] = word;
     return word;
   }
+
+  private gameLocks: Record<string, boolean> = {};
+  private lastTurnTimestamps: Record<string, number> = {};
   async switchTurn(gameCode: string) {
     const game = await this.getGame(gameCode);
     if (!game) throw new Error("Game not found");
 
-    const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
-    const currentPlayers = game[currentTeam].players;
-    const currentDescriber = this.getRandomUser(currentPlayers);
-    const guessers = currentPlayers.filter(
-      (player) => player !== currentDescriber,
-    );
 
-    const updatedGame = await gameModel.findByIdAndUpdate(
-      game._id,
-      { $inc: { currentTurn: 1 } }, // Increment currentTurn by 1
-      { new: true, runValidators: true },
-    );
+    const lastTimestamp = this.lastTurnTimestamps[gameCode] || 0;
+    const currentTimestamp = Date.now();
+    if (this.gameLocks[gameCode] || currentTimestamp - lastTimestamp < 2000) {
+      return;
+      //throw new Error("Turn switch in progress or happened too recently. Try again shortly.");
+    }
+    this.gameLocks[gameCode] = true;
+    try {
+      const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
+      const currentPlayers = game[currentTeam].players;
+      const currentDescriber = this.getRandomUser(currentPlayers);
+      const guessers = currentPlayers.filter(
+        (player) => player !== currentDescriber,
+      );
 
-    const turnData = { currentTeam, describer: currentDescriber, guessers };
-    this.gamesTurns[gameCode] = turnData;
-    return turnData;
+      const updatedGame = await gameModel.findByIdAndUpdate(
+        game._id,
+        { $inc: { currentTurn: 1 } }, // Increment currentTurn by 1
+        { new: true, runValidators: true },
+      );
+
+      if (!updatedGame) {
+        throw new Error("Turn switch failed due to concurrent modification. Please try again.");
+      }
+
+      const turnData = {
+        currentTeam,
+        describer: currentDescriber,
+        guessers,
+        currentTurn:
+          updatedGame.currentTurn,
+        totalRounds:
+          updatedGame.totalRounds
+      };
+      this.gamesTurns[gameCode] = turnData;
+      this.lastTurnTimestamps[gameCode] = Date.now();
+      return turnData;
+    }
+    finally {
+      this.gameLocks[gameCode] = false;
+    }
   }
 
   getCurrentTurn(gameCode: string) {

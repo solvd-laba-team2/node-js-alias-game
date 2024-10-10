@@ -1,6 +1,6 @@
 const startButton = document.querySelector("#start-game");
 
-
+const rounds = document.querySelector("#rounds");
 const startGame = (e) => {
   e.preventDefault();
   createNewWord();
@@ -39,6 +39,7 @@ const loadCurrentTurn = () => {
           showWordField();
           disableChat();
         }
+        rounds.innerHTML = `${data.currentTurn} / ${data.totalRounds}`;
         currentTeamTurn = data.currentTeam;
         document.getElementById("describer").innerHTML = describer;
         document.getElementById("guessers").innerHTML = guessers.join(", ");
