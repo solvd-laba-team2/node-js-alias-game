@@ -15,6 +15,8 @@ class GameService {
 
   private currentWords: Record<string, string> = {};
 
+  private gamesTurns: Record<string, number> = {};
+
   private constructor() {
     this.socketService = SocketService.getInstance();
   }
@@ -96,7 +98,7 @@ class GameService {
     points: number,
   ) {
     const currentGame = this.userScores[gameCode];
-    
+
     if (!currentGame) {
       this.userScores[gameCode] = {};
     }
@@ -170,7 +172,7 @@ class GameService {
       return;
     }
 
-    this.socketService.emitToGameRoom(gameId, "turnStarted", {
+    this.socketService.emitToGameRoom(gameId, "newTurn", {
       describer,
       guessers,
       team,
@@ -246,6 +248,39 @@ class GameService {
     const word = generateWord(difficultyWordOptions[gameDifficulty]);
     this.currentWords[gameCode] = word;
     return word;
+  }
+  async switchTurn(gameCode: string) {
+    const game = await this.getGame(gameCode);
+    const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
+
+    const game2 = {
+      team1:{
+        players: ["Sehiy", "Andrew", "John"]
+      },
+      team2:{
+        players: ["Mathew", "Marcus", "Pablo"]
+      }
+    };
+
+    const currentPlayers = game2[currentTeam].players;
+
+    const previousTurn = this.gamesTurns[gameCode] || null;
+
+    const currentDescriber = this.getRandomUser(currentPlayers);
+
+    const guessers = currentPlayers.filter(
+      (player) => player !== currentDescriber,
+    );
+
+    game.currentTurn = game.currentTurn + 1;
+    await game.save();
+
+    return { currentTeam, describer: currentDescriber, guessers };
+  }
+
+  getRandomUser(users: string[]) {
+    const user = users[Math.floor(Math.random() * users.length)];
+    return user || null;
   }
 }
 

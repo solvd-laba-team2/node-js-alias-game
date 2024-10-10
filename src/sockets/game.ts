@@ -49,10 +49,7 @@ export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
     socket.on("newTurn", (gameCode) => {
-      const describer = "Serhiy";
-      const guessers = ["Ivan", "John"];
-      const data = { describer, guessers };
-      io.to(gameCode).emit("newTurn", data);
+      io.to(gameCode).emit("newTurn");
       io.to(gameCode).emit("blockButtons");
     });
 

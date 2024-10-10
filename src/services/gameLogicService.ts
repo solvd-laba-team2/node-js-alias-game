@@ -6,7 +6,7 @@ class GameLogicService {
     team1: [],
     team2: []
   };
-
+  
   // Public method to start a turn in the game
   public static startTurn(game: IGame): { describer: string | null, guessers: string[], team: "team1" | "team2" } {
     let team: "team1" | "team2";
@@ -32,7 +32,7 @@ class GameLogicService {
 
     // Increment the turn counter
     game.currentTurn += 1;
-
+    
     return { describer, guessers, team };
   }
 

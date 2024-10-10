@@ -44,4 +44,6 @@ router.get("/:gameCode/currentWord", gameController.getCurrentWord);
 
 router.get("/:gameCode/scores", gameController.getCurrentScores);
 
+router.get("/:gameCode/switchTurn", gameController.switchTurn);
+
 export default router;

@@ -31,7 +31,6 @@ swapTeamButton.addEventListener("click", () => {
   socket.emit("swapTeam", data);
 });
 
-
 // Listen for chat messages from the server
 socket.on("chatMessage", (data) => {
   messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
@@ -42,23 +41,22 @@ socket.on("userJoined", (data) => {
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
-  playersList1.innerHTML = '';
-  playersList2.innerHTML = '';
+  playersList1.innerHTML = "";
+  playersList2.innerHTML = "";
 
   // Populate team1 players
-  data.team1.players.forEach(player => {
-    const li = document.createElement('li');
+  data.team1.players.forEach((player) => {
+    const li = document.createElement("li");
     li.textContent = player;
     playersList1.appendChild(li);
   });
 
   // Populate team2 players
-  data.team2.players.forEach(player => {
-    const li = document.createElement('li');
+  data.team2.players.forEach((player) => {
+    const li = document.createElement("li");
     li.textContent = player;
     playersList2.appendChild(li);
   });
-
 });
 
 socket.on("systemMessage", (message) => {
@@ -67,10 +65,6 @@ socket.on("systemMessage", (message) => {
 });
 
 // Listen for new turn and role assignments
-socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
-  console.log(`New describer: ${describer}, guessers: ${guessers}`);
-});
 
 let timeLeft = 60; // Start timer at 60 seconds
 const timerElement = document.getElementById("timer");
@@ -88,11 +82,33 @@ const startTimer = () => {
   }, 1000);
 };
 
+
+let describer;
+let guessers;
+let currentTeam;
+
+const switchTurn = () => {
+  const request = fetch(window.location.href + "/switchTurn");
+  request.then((response) => {
+    if (response.ok === true) {
+      response.json().then((data) => {
+        describer = data.describer;
+        guessers = data.guessers;
+        currentTeamTurn = data.currentTeam;
+        document.getElementById("describer").textContent = describer;
+        document.getElementById("guessers").textContent = guessers.join(", ");
+      });
+    }
+  });
+};
+
+hideWordField = () => {
+  
+};
+
 // Listen for new turn event to reset timer and update roles
-socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
-  document.getElementById("describer").textContent = describer;
-  document.getElementById("guessers").textContent = guessers.join(", ");
+socket.on("newTurn", () => {
+  switchTurn();
   timeLeft = 60; // Reset timer for the new turn
   startTimer(); // Start the timer for the new turn
 });

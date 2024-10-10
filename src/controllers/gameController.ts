@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
 import { Types } from "mongoose";
+import GameLogicService from "../services/gameLogicService";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
@@ -156,7 +157,6 @@ export const addMessageToChat = async (req: Request, res: Response) => {
 // Start a new turn
 export const startTurn = async (req: Request, res: Response) => {
   const { gameId } = req.params;
-
   try {
     await GameService.getInstance().startTurn(gameId);
     res.status(200).json({ message: "Turn started" });
@@ -200,6 +200,12 @@ export const getTeams = async (req: Request, res: Response) => {
   }
 };
 
+export const switchTurn = async (req: Request, res: Response) => {
+  const gameCode = req.params.gameCode;
+  const currentTurn = await GameService.getInstance().switchTurn(gameCode);
+  res.status(200).json(currentTurn);
+};
+
 export default {
   renderCreateGameForm,
   createGame,
@@ -214,5 +220,6 @@ export default {
   getGenerateWord,
   getCurrentWord,
   getTeams,
-  getCurrentScores
+  getCurrentScores,
+  switchTurn,
 };
