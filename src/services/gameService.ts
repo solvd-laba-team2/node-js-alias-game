@@ -5,7 +5,6 @@ import SocketService from "../services/socketService";
 import { getOriginalId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
 import GameLogicService from "./gameLogicService";
-import { getOriginalId } from "../utils/hash";
 
 class GameService {
   private socketService: SocketService;
@@ -79,12 +78,12 @@ class GameService {
   }
 
 
-  async rmUser(gameId: string, username: string) {
+  async rmUser(gameId: string, teamId: "team1" | "team2", username: string) {
     const game = await gameModel.findById(getOriginalId(gameId));
     if (!game) throw new Error("Game not found");
-    if (game.team1.players.includes(username)) {
+    if (teamId === "team1") {
       game.team1.players = game.team1.players.filter(e => e !== username);
-    } else if (game.team2.players.includes(username)) {
+    } else if (teamId === "team2") {
       game.team2.players = game.team2.players.filter(e => e !== username);
     } else {
       throw new Error("User not found in either team");

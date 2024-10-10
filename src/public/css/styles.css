@@ -399,7 +399,8 @@ p {
 
 .player-list-left,
 .player-list-right {
-  width: 15%;
+  flex: 1;
+  /* Adjusts the width of each player list */
   background-color: #f9f9f9;
   padding: 10px;
   border-radius: 5px;
@@ -415,17 +416,22 @@ p {
 }
 
 .center-content {
-  width: 65%;
+  flex: 2;
+  /* Center content takes more space */
   padding: 0 20px;
 }
 
-ul {
+/* Make sure the ul inside player lists has correct styling */
+.player-list-left ul,
+.player-list-right ul {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 li {
   margin: 10px 0;
+  /* Margin between players */
   font-size: 1.1em;
   color: #333;
 }
@@ -456,4 +462,3 @@ li {
   justify-content: center;
   padding: 10px;
 }
-

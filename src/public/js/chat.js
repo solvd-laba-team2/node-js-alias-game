@@ -4,6 +4,7 @@ const chatWindow = document.querySelector(".chat-window");
 const messages = document.querySelector(".chat-messages");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message-input");
+const swapTeamButton = document.getElementById("swap-team-button");
 
 const playersList1 = document.getElementById("player-list1");
 const playersList2 = document.getElementById("player-list2");
@@ -25,7 +26,18 @@ form.addEventListener("submit", (e) => {
   input.value = "";
 });
 
+swapTeamButton.addEventListener("click", () => {
+  // Emit an event to the server, indicating the user wants to swap teams
+  socket.emit("swapTeam", data);
+});
+
+
 // Listen for chat messages from the server
+socket.on("chatMessage", (data) => {
+  messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+});
+
 socket.on("userJoined", (data) => {
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
