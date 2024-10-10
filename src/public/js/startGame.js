@@ -5,7 +5,7 @@ const startGame = (e) => {
   e.preventDefault();
   createNewWord();
   console.log("startGame triggered");
-  socket.emit("startGame", gameId);
+  socket.emit("startGame", gameId, roundTime, totalRounds);
 };
 
 startButton.addEventListener("click", startGame);

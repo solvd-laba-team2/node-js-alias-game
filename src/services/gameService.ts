@@ -57,7 +57,7 @@ class GameService {
     return newGame; // Return the new game
   }
 
-  // Get a game by gameId
+  // Get a game by gameCode
   async getGame(gameId: string): Promise<IGame | null> {
     const originalId = getOriginalId(gameId);
     const game = await gameModel.findById(originalId); // Find the game in the database by ID
@@ -249,6 +249,7 @@ class GameService {
     this.currentWords[gameCode] = word;
     return word;
   }
+
   async switchTurn(gameCode: string) {
     const game = await this.getGame(gameCode);
     if (!game) throw new Error("Game not found");

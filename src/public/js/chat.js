@@ -5,6 +5,7 @@ const messages = document.querySelector(".chat-messages");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message-input");
 const swapTeamButton = document.getElementById("swap-team-button");
+const roundsElement = document.getElementById("rounds");
 
 const playersList1 = document.getElementById("player-list1");
 const playersList2 = document.getElementById("player-list2");
@@ -13,8 +14,8 @@ const gameId = form.dataset.gameId;
 const currentUser = form.dataset.currentUser;
 
 const totalRounds = parseInt(form.dataset.totalRounds);
-const roundTime = parseInt(form.dataset.roundTime);
-// const roundTime = 5;
+// const roundTime = parseInt(form.dataset.roundTime);
+const roundTime = 5;
 
 const usersTeam = "";
 const team1 = { players: [] };
@@ -106,17 +107,18 @@ const showUpdate = () => {
 };
 
 // Listen for new turn event to reset timer and update roles
-socket.on("newTurn", () => {
+socket.on("newTurn", (currentRound) => {
   console.log("newTurn event");
+  roundsElement.innerHTML = `${currentRound} / ${totalRounds}`;
   loadCurrentTurn();
 });
 
-socket.on("startGame", ()=>{
+socket.on("startGame", () => {
   console.log("startGame event");
   loadCurrentTurn();
-  startTimer(roundTime);
-})
+  // startTimer(roundTime);
+});
 
-socket.on("gameEnd", ()=>{
+socket.on("endGame", () => {
   console.log("Trigger end game");
-})
+});
