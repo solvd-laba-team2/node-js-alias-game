@@ -42,4 +42,6 @@ router.get("/:gameCode/getTeams", gameController.getTeams);
 
 router.get("/:gameCode/currentWord", gameController.getCurrentWord);
 
+router.get("/:gameCode/scores", gameController.getCurrentScores);
+
 export default router;

@@ -75,12 +75,26 @@ export const createGame = async (req: Request, res: Response) => {
       gameName,
       difficulty,
       roundTime,
-      totalRounds
+      totalRounds,
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
     res.redirect(`/game/${shortId}`);
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const getCurrentScores = async (req: Request, res: Response) => {
+  try {
+    const gameCode = req.params.gameCode;
+    const scores = await GameService.getInstance().getCurrentScores(gameCode);
+    res.status(200).json({ scores });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(404).json({ error: err.message });
+    } else {
+      res.status(404).json({ error: "Current word not found" });
+    }
   }
 };
 
@@ -102,8 +116,8 @@ export const updateScore = async (req: Request, res: Response) => {
 
   try {
     await GameService.getInstance().updateUserScoreInMemory(
-      gameId,
       username,
+      gameId,
       parseInt(points),
     );
     res
@@ -175,9 +189,10 @@ export const joinGame = async (req: Request, res: Response) => {
 };
 //endpoint to get teams
 export const getTeams = async (req: Request, res: Response) => {
-  const { gameCode } = req.body;
+  const { gameCode } = req.params;
   try {
     const game = await GameService.getInstance().getGame(gameCode);
+    console.log(game);
     const teams = { team1: game.team1.players, team2: game.team2.players };
     res.status(200).json(teams);
   } catch (error) {
@@ -198,5 +213,6 @@ export default {
   renderRoomPage,
   getGenerateWord,
   getCurrentWord,
-  getTeams
+  getTeams,
+  getCurrentScores
 };

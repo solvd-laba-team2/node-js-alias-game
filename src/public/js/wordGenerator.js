@@ -1,5 +1,5 @@
 const wordField = document.querySelector(".word-field h1");
-const button = document.querySelector(".word-field .button");
+const wordGenBUtton = document.querySelector(".word-field .button");
 const currentUrl = window.location.href;
 
 socket.on("new-word", () => {
@@ -29,7 +29,7 @@ const createNewWord = () => {
 
 socket.on("word-guessed", createNewWord);
 
-button.addEventListener("click", (e) => {
+wordGenBUtton.addEventListener("click", (e) => {
   e.preventDefault();
   createNewWord();
 });

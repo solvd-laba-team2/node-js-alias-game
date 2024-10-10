@@ -38,18 +38,43 @@ async function getChatHistory(gameId: string): Promise<IMessage[]> {
   return chat ? chat.messages : [];
 }
 
-export function checkGuesserMessage(gameId: string, message: string) {
+export function checkGuesserMessage(
+  gameId: string,
+  message: string,
+  user: string,
+) {
   const currentWord = GameService.getInstance().getCurrentWord(gameId);
   const socketService = SocketService.getInstance();
-  if (currentWord === message) {
-    socketService.emitToGameRoom(gameId, "word-guessed", {});
+  if (currentWord === message.toLowerCase()) {
+    handleWordGuessed(gameId, user, 2);
+    socketService.emitToGameRoom(gameId, "wordGuessed", {});
     socketService.emitToGameRoom(gameId, "systemMessage", "Correct!");
+    socketService.emitToGameRoom(gameId, "scoreUpdated", {});
   }
   return false;
 }
 
+export const handleWordGuessed = async (
+  gameId: string,
+  userId: string,
+  points: number,
+) => {
+  try {
+    await GameService.getInstance().updateUserScoreInMemory(
+      userId,
+      gameId,
+      points,
+    );
+  } catch (error) {
+    console.error("Error handling wordGuessed event:", error);
+  }
+};
 
-export const handleSwapTeam = async (io: Server, socket: Socket, data: JoinData) => {
+export const handleSwapTeam = async (
+  io: Server,
+  socket: Socket,
+  data: JoinData,
+) => {
   const game = await GameService.getInstance().getGame(data.gameId);
 
   if (game.team1.players.includes(data.user)) {
@@ -65,17 +90,25 @@ export const handleSwapTeam = async (io: Server, socket: Socket, data: JoinData)
   data.team1.players = updatedGame.team1.players;
   data.team2.players = updatedGame.team2.players;
 
-
   console.log(data);
   io.to(data.gameId).emit("userJoined", data);
 };
-export const handleJoinRoom = async (io: Server, socket: Socket, data: JoinData) => {
+export const handleJoinRoom = async (
+  io: Server,
+  socket: Socket,
+  data: JoinData,
+) => {
   socket.join(data.gameId);
   console.log(`User ${data.user} joined room: ${data.gameId}`);
 
   const game = await GameService.getInstance().getGame(data.gameId);
 
-  if (!(game.team1.players.includes(data.user) || game.team2.players.includes(data.user))) {
+  if (
+    !(
+      game.team1.players.includes(data.user) ||
+      game.team2.players.includes(data.user)
+    )
+  ) {
     const team = GameLogicService.getRandomTeam();
     data.usersTeam = team;
     await GameService.getInstance().addUser(data.gameId, team, data.user);
@@ -90,7 +123,6 @@ export const handleJoinRoom = async (io: Server, socket: Socket, data: JoinData)
   console.log(data);
   io.to(data.gameId).emit("userJoined", data);
 };
-
 export const handleChatMessage = (messageData: MessageData) => {
   const { message, gameId, user } = messageData;
   console.log("Message received:", messageData);
@@ -105,7 +137,7 @@ export const handleChatMessage = (messageData: MessageData) => {
   });
 
   // If user is not describer, so he is guesser
-  checkGuesserMessage(gameId, message);
+  checkGuesserMessage(gameId, message, user);
 };
 
 export default {
@@ -113,5 +145,5 @@ export default {
   addMessageToChat,
   getChatHistory,
   handleChatMessage,
-  handleJoinRoom
+  handleJoinRoom,
 };
