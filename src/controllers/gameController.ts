@@ -50,8 +50,12 @@ export const renderRoomPage = async (req: Request, res: Response) => {
 
 export const getGenerateWord = async (req: Request, res: Response) => {
   const gameCode = req.params.gameCode;
-  const word = await GameService.getInstance().generateWord(gameCode);
-  res.status(200).json({ word });
+  try {
+    const word = await GameService.getInstance().generateWord(gameCode);
+    res.status(200).json({ word });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
 };
 
 export const getCurrentWord = (req: Request, res: Response) => {
@@ -152,8 +156,13 @@ export const startTurn = async (req: Request, res: Response) => {
 };
 
 export const renderJoinGamePage = async (req: Request, res: Response) => {
-  const games = await GameService.getInstance().getOnlyNotStartedGames();
-  res.render("join-game", { games: games });
+  try {
+    const games = await GameService.getInstance().getOnlyNotStartedGames();
+    res.render("join-game", { games: games });
+  } catch (error) {
+    console.error("Error fetching games: ", error);
+    res.render("join-game", { games: [] });
+  }
 };
 
 export const joinGame = async (req: Request, res: Response) => {
