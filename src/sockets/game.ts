@@ -48,9 +48,9 @@ const updateUsersWord = async (io: Server, gameId: string) => {
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
-    socket.on("newTurn", async (gameCode) => {
+    socket.on("startGame", async (gameCode) => {
       await GameService.getInstance().switchTurn(gameCode);
-      io.to(gameCode).emit("newTurn");
+      io.to(gameCode).emit("startGame");
       io.to(gameCode).emit("blockButtons");
     });
 
@@ -64,18 +64,27 @@ export default (io: Server) => {
 
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
 
-    socket.on("startTimer", (gameCode: string, seconds: number) => {
-      const timerInterval = setInterval(async () => {
-        if (seconds <= 0) {
-          await GameService.getInstance().switchTurn(gameCode);
-          io.to(gameCode).emit("newTurn");
-          clearInterval(timerInterval);
-          return; // Ensure no further code is executed
-        } else {
-          io.to(gameCode).emit("timerTick", seconds);
-          seconds--;
-        }
-      }, 1000);
-    });
+    socket.on(
+      "startTimer",
+      (gameCode: string, seconds: number, totalRounds: number) => {
+        const initialTime = seconds;
+        const timerInterval = setInterval(async () => {
+          if (seconds <= 0) {
+            totalRounds--;
+            if (totalRounds > 0) {
+              seconds = initialTime; // Reset timer for the new round (assuming each round is 60 seconds)
+              await GameService.getInstance().switchTurn(gameCode);
+              io.to(gameCode).emit("newTurn");
+            } else {
+              clearInterval(timerInterval); // Stop the interval when no rounds are left
+              return;
+            }
+          } else {
+            io.to(gameCode).emit("timerTick", seconds);
+            seconds--;
+          }
+        }, 1000); // 1 second interval
+      },
+    );
   });
 };

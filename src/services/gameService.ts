@@ -251,29 +251,21 @@ class GameService {
   }
   async switchTurn(gameCode: string) {
     const game = await this.getGame(gameCode);
+    if (!game) throw new Error("Game not found");
+
     const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
-
-    // const game2 = { // For testing purposes
-    //   team1:{
-    //     players: ["Sehiy", "Andrew", "John"]
-    //   },
-    //   team2:{
-    //     players: ["Mathew", "Marcus", "Pablo"]
-    //   }
-    // };
-
     const currentPlayers = game[currentTeam].players;
-
-    const previousTurn = this.gamesTurns[gameCode] || null;
-
     const currentDescriber = this.getRandomUser(currentPlayers);
-
     const guessers = currentPlayers.filter(
       (player) => player !== currentDescriber,
     );
 
-    game.currentTurn = game.currentTurn + 1;
-    await game.save();
+    const updatedGame = await gameModel.findByIdAndUpdate(
+      game._id,
+      { $inc: { currentTurn: 1 } }, // Increment currentTurn by 1
+      { new: true, runValidators: true },
+    );
+
     const turnData = { currentTeam, describer: currentDescriber, guessers };
     this.gamesTurns[gameCode] = turnData;
     return turnData;

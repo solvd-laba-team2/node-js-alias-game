@@ -14,6 +14,7 @@ const currentUser = form.dataset.currentUser;
 
 const totalRounds = parseInt(form.dataset.totalRounds);
 const roundTime = parseInt(form.dataset.roundTime);
+// const roundTime = 5;
 
 const usersTeam = "";
 const team1 = { players: [] };
@@ -108,5 +109,14 @@ const showUpdate = () => {
 socket.on("newTurn", () => {
   console.log("newTurn event");
   loadCurrentTurn();
-  startTimer(roundTime);
 });
+
+socket.on("startGame", ()=>{
+  console.log("startGame event");
+  loadCurrentTurn();
+  startTimer(roundTime);
+})
+
+socket.on("gameEnd", ()=>{
+  console.log("Trigger end game");
+})
