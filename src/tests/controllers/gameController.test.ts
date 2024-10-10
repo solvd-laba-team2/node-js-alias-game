@@ -414,6 +414,7 @@ describe("GameController - renderJoinGamePage", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let renderMock: jest.Mock;
+    let consoleSpy: jest.SpyInstance;
 
     beforeEach(() => {
         req = {};
@@ -421,6 +422,11 @@ describe("GameController - renderJoinGamePage", () => {
         res = {
             render: renderMock,
         };
+        consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        consoleSpy.mockRestore();
     });
 
     it("should render join-game page with the list of not started games", async () => {
@@ -446,11 +452,14 @@ describe("GameController - renderJoinGamePage", () => {
         expect(res.render).toHaveBeenCalledWith("join-game", { games: [] });
     });
 });
+
+
 describe("GameController - startTurn", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let statusMock: jest.Mock;
     let jsonMock: jest.Mock;
+    let consoleSpy: jest.SpyInstance; // Dodajemy consoleSpy
 
     beforeEach(() => {
         req = { params: { gameId: "mockedGameId" } };
@@ -461,6 +470,14 @@ describe("GameController - startTurn", () => {
             status: statusMock,
             json: jsonMock,
         };
+
+
+        consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+
+        consoleSpy.mockRestore();
     });
 
     it("should start a turn and return success message", async () => {
