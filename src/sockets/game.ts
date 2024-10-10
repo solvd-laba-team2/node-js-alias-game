@@ -48,8 +48,8 @@ const updateUsersWord = async (io: Server, gameId: string) => {
 export default (io: Server) => {
   io.on("connection", (socket: Socket) => {
     // socket.on("timeUp", (gameId: string) => handleTimeUp(io, gameId)); handleTimeUp needs fixes
-    socket.on("newTurn", (gameCode) => {
-      GameService.getInstance().switchTurn(gameCode);
+    socket.on("newTurn", async (gameCode) => {
+      await GameService.getInstance().switchTurn(gameCode);
       io.to(gameCode).emit("newTurn");
       io.to(gameCode).emit("blockButtons");
     });
@@ -65,9 +65,9 @@ export default (io: Server) => {
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
 
     socket.on("startTimer", (gameCode: string, seconds: number) => {
-      console.log("Starting timer");
-      const timerInterval = setInterval(() => {
+      const timerInterval = setInterval(async () => {
         if (seconds <= 0) {
+          await GameService.getInstance().switchTurn(gameCode);
           io.to(gameCode).emit("newTurn");
           clearInterval(timerInterval);
           return; // Ensure no further code is executed

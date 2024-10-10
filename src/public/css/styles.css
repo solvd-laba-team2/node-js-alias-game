@@ -469,3 +469,7 @@ li {
 #swap-team-button {
   display: none;
 }
+
+#update-word {
+  display: none;
+}

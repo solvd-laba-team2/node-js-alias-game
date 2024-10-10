@@ -1,5 +1,6 @@
 const startButton = document.querySelector("#start-game");
 
+
 const startGame = (e) => {
   e.preventDefault();
   createNewWord();
@@ -25,20 +26,22 @@ const loadCurrentTurn = () => {
       response.json().then((data) => {
         describer = data.describer;
         guessers = data.guessers;
-
         if (guessers.includes(currentUser)) {
+          hideUpdate();
           hideWordField();
           enableChat();
         } else if (currentUser === describer) {
+          showUpdate();
           showWordField();
           enableChat();
         } else {
+          hideUpdate();
           showWordField();
           disableChat();
         }
         currentTeamTurn = data.currentTeam;
-        document.getElementById("describer").textContent = describer;
-        document.getElementById("guessers").textContent = guessers.join(", ");
+        document.getElementById("describer").innerHTML = describer;
+        document.getElementById("guessers").innerHTML = guessers.join(", ");
       });
     } else {
       showElement(startButton);
@@ -55,18 +58,21 @@ const switchTurn = () => {
         describer = data.describer;
         guessers = data.guessers;
         if (guessers.includes(currentUser)) {
+          hideUpdate();
           hideWordField();
           enableChat();
         } else if (currentUser === describer) {
+          showUpdate();
           showWordField();
           enableChat();
         } else {
+          hideUpdate();
           showWordField();
           disableChat();
         }
         currentTeamTurn = data.currentTeam;
-        document.getElementById("describer").textContent = describer;
-        document.getElementById("guessers").textContent = guessers.join(", ");
+        document.getElementById("describer").innerHTML = describer;
+        document.getElementById("guessers").innerHTML = guessers.join(", ");
       });
     }
   });

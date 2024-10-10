@@ -11,6 +11,10 @@ const playersList2 = document.getElementById("player-list2");
 // Use data attributes to pass dynamic data
 const gameId = form.dataset.gameId;
 const currentUser = form.dataset.currentUser;
+
+const totalRounds = parseInt(form.dataset.totalRounds);
+const roundTime = parseInt(form.dataset.roundTime);
+
 const usersTeam = "";
 const team1 = { players: [] };
 const team2 = { players: [] };
@@ -92,9 +96,17 @@ const showWordField = () => {
   document.querySelector(".word-field").style.display = "flex";
 };
 
+const hideUpdate = () => {
+  document.querySelector("#update-word").style.display = "none";
+};
+
+const showUpdate = () => {
+  document.querySelector("#update-word").style.display = "inline-block";
+};
+
 // Listen for new turn event to reset timer and update roles
 socket.on("newTurn", () => {
   console.log("newTurn event");
   loadCurrentTurn();
-  startTimer(30);
+  startTimer(roundTime);
 });

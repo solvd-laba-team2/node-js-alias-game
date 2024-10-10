@@ -16,7 +16,7 @@
     <div id="rounds" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
     <div class="word-field">
       <h1><img class="loading" src="/assets/loading60.gif" alt="" /></h1>
-      <button class="button small-btn">
+      <button id="update-word" class="button small-btn">
         <img
           class="icon"
           src="/assets/update-word.svg"
@@ -58,6 +58,8 @@
         id="chat-form"
         data-game-id="{{gameName}}"
         data-current-user="{{currentUser}}"
+        data-total-rounds="{{totalRounds}}"
+        data-round-time="{{roundTime}}"
       >
         <input
           id="message-input"
@@ -87,5 +89,5 @@
 <script src="/js/wordGenerator.js"></script>
 <script src="/js/timer.js"></script>
 <script src="/js/score.js"></script>
-<script src="/js/startGame.js"></script>
 <script src="/js/blockButtons.js"></script>
+<script src="/js/startGame.js"></script>
