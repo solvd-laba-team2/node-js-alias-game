@@ -17,8 +17,7 @@ const totalRounds = parseInt(form.dataset.totalRounds);
 
 const gameStatus = form.dataset.gameStatus;
 
-// const roundTime = parseInt(form.dataset.roundTime);
-const roundTime = 5;
+const roundTime = parseInt(form.dataset.roundTime);
 
 const usersTeam = "";
 const team1 = { players: [] };
@@ -66,6 +65,13 @@ socket.on("chatMessage", (data) => {
 });
 
 socket.on("userJoined", (data) => {
+  if (gameStatus === "finished") {
+    disableChat();
+    hideWordField();
+    blockControlButtons();
+    document.querySelector(".game-name").innerHTML = "Game is finished";
+    return;
+  }
   console.log("gameStatus", gameStatus);
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;

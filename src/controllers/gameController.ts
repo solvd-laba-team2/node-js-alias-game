@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
 import { Types } from "mongoose";
-import GameLogicService from "../services/gameLogicService";
 
 // Render the form for creating a game
 export const renderCreateGameForm = (req: Request, res: Response) => {
