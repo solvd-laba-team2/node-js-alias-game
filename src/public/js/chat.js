@@ -59,6 +59,7 @@ socket.on("userJoined", (data) => {
     li.textContent = player;
     playersList2.appendChild(li);
   });
+  loadCurrentTurn();
 });
 
 socket.on("systemMessage", (message) => {
@@ -90,6 +91,32 @@ let currentTeam;
 
 const disableChat = () => {
   document.querySelector("#message-input").disabled = true;
+};
+
+const loadCurrentTurn = () => {
+  const request = fetch(window.location.href + "/getTurn");
+  request.then((response) => {
+    if (response.ok === true) {
+      response.json().then((data) => {
+        describer = data.describer;
+        guessers = data.guessers;
+        if (guessers.includes(currentUser)) {
+          hideWordField();
+        } else if (
+          currentUser !== describer &&
+          !guessers.includes(currentUser)
+        ) {
+          disableChat();
+        }
+        currentTeamTurn = data.currentTeam;
+        document.getElementById("describer").textContent = describer;
+        document.getElementById("guessers").textContent = guessers.join(", ");
+      });
+    } else {
+      showElement(startButton);
+      showElement(swapTeamButton);
+    }
+  });
 };
 
 const switchTurn = () => {

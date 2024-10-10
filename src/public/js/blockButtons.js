@@ -1,6 +1,12 @@
-socket.on("blockButtons", ()=>{
-    startButton.disabled = true;
-    swapTeamButton.disabled = true;
-    startButton.style.display = "none";
-    swapTeamButton.style.display = "none";
-})
+const hideElement = (el) => {
+  el.style.display = "none";
+};
+
+const showElement = (el) => {
+  el.style.display = "inline-block";
+};
+
+socket.on("blockButtons", () => {
+  hideElement(startButton);
+  hideElement(swapTeamButton);
+});

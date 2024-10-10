@@ -206,6 +206,20 @@ export const switchTurn = async (req: Request, res: Response) => {
   res.status(200).json(currentTurn);
 };
 
+export const getTurn = async (req: Request, res: Response) => {
+  const gameCode = req.params.gameCode;
+  const currentTurnData = await GameService.getInstance().getCurrentTurn(
+    gameCode,
+  );
+  if (!currentTurnData) {
+    res.status(404).json({
+      error: "current turn not found",
+    });
+    return;
+  }
+  res.status(200).json(currentTurnData);
+};
+
 export default {
   renderCreateGameForm,
   createGame,
@@ -222,4 +236,5 @@ export default {
   getTeams,
   getCurrentScores,
   switchTurn,
+  getTurn,
 };

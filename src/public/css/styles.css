@@ -390,7 +390,6 @@ p {
   margin-left: 5px;
 }
 
-
 .game-room {
   display: flex;
   justify-content: space-between;
@@ -461,4 +460,12 @@ li {
   align-items: center;
   justify-content: center;
   padding: 10px;
+}
+
+#start-game {
+  display: none;
+}
+
+#swap-team-button {
+  display: none;
 }

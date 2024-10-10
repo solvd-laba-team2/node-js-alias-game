@@ -15,7 +15,7 @@ class GameService {
 
   private currentWords: Record<string, string> = {};
 
-  private gamesTurns: Record<string, number> = {};
+  private gamesTurns = {};
 
   private constructor() {
     this.socketService = SocketService.getInstance();
@@ -274,8 +274,13 @@ class GameService {
 
     game.currentTurn = game.currentTurn + 1;
     await game.save();
+    const turnData = { currentTeam, describer: currentDescriber, guessers };
+    this.gamesTurns[gameCode] = turnData;
+    return turnData;
+  }
 
-    return { currentTeam, describer: currentDescriber, guessers };
+  getCurrentTurn(gameCode: string) {
+    return this.gamesTurns[gameCode] || null;
   }
 
   getRandomUser(users: string[]) {

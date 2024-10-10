@@ -46,4 +46,6 @@ router.get("/:gameCode/scores", gameController.getCurrentScores);
 
 router.get("/:gameCode/switchTurn", gameController.switchTurn);
 
+router.get("/:gameCode/getTurn", gameController.getTurn);
+
 export default router;
