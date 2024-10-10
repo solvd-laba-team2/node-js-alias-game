@@ -62,5 +62,15 @@ export default (io: Server) => {
     );
 
     socket.on("new-word", (gameId: string) => updateUsersWord(io, gameId));
+
+    socket.on("startTimer", (gameId: string, seconds: number) => {
+      const timerInterval = setInterval(() => {
+        if (seconds < 0) {
+          return clearInterval(timerInterval);
+        }
+        io.to(gameId).emit("timerTick",  seconds);
+        seconds--;
+      }, 1000);
+    });
   });
 };

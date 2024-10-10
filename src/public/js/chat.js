@@ -17,6 +17,10 @@ const team2 = { players: [] };
 
 const data = { gameId, user: currentUser, usersTeam, team1, team2 };
 
+let describer;
+let guessers;
+let currentTeam;
+
 socket.emit("join room", data);
 
 form.addEventListener("submit", (e) => {
@@ -67,27 +71,8 @@ socket.on("systemMessage", (message) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
-// Listen for new turn and role assignments
 
-let timeLeft = 60; // Start timer at 60 seconds
-const timerElement = document.getElementById("timer");
 
-const startTimer = () => {
-  const interval = setInterval(() => {
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      // Emit to the server that the time is up
-      socket.emit("timeUp", gameId);
-    } else {
-      timeLeft--;
-      timerElement.textContent = timeLeft;
-    }
-  }, 1000);
-};
-
-let describer;
-let guessers;
-let currentTeam;
 
 const disableChat = () => {
   document.querySelector("#message-input").disabled = true;
