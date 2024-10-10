@@ -117,6 +117,10 @@ socket.on("startGame", () => {
   startTimer(roundTime);
 })
 
-socket.on("gameEnd", () => {
+socket.on("gameEnd", (scoreData) => {
+  console.log("gameEnd event");
+  messages.innerHTML += `<p><strong>Game ended! The winner is ${scoreData.winner}</strong></p>`;
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+  disableChat();
   console.log("Trigger end game");
 })

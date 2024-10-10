@@ -77,6 +77,8 @@ export default (io: Server) => {
               io.to(gameCode).emit("newTurn");
             } else {
               clearInterval(timerInterval); // Stop the interval when no rounds are left
+              const scores = await GameService.getInstance().getCurrentScores(gameCode);
+              io.to(gameCode).emit("gameEnd", { winner: scores.winner });
               return;
             }
           } else {

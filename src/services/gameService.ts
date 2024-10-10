@@ -120,8 +120,10 @@ class GameService {
     return userScore;
   }
 
-  async getCurrentScores(gameCode) {
+  async getCurrentScores(gameCode: string) {
     const game = await this.getGame(gameCode);
+    if (!game) throw new Error("Game not found");
+
     const team1Score = game.team1.players.reduce((score, player) => {
       return score + this.getUserScore(gameCode, player);
     }, 0);
@@ -129,7 +131,18 @@ class GameService {
     const team2Score = game.team2.players.reduce((score, player) => {
       return score + this.getUserScore(gameCode, player);
     }, 0);
-    return { team1: team1Score, team2: team2Score };
+
+    let winner: string | null = null;
+
+    if (team1Score > team2Score) {
+      winner = "team1";
+    } else if (team2Score > team1Score) {
+      winner = "team2";
+    } else {
+      winner = "draw"; // If scores are equal, declare a tie
+    }
+
+    return { team1: team1Score, team2: team2Score, winner };
   }
 
   async saveUserScoresToDatabase(gameId: string): Promise<void> {
@@ -184,18 +197,7 @@ class GameService {
   }
 
   async endGame(gameId: string): Promise<void> {
-    const game = this.getActiveGame(gameId);
-
-    if (!game) throw new Error("Game not found");
-
-    game.status = "finished";
-
-    await this.saveUserScoresToDatabase(gameId);
-    this.activeGames.delete(gameId);
-
-    this.socketService.emitToGameRoom(gameId, "gameEnded", {
-      message: "The game has ended!",
-    });
+    // Remove the game from memory
   }
 
   // Add a message to the game's chat
