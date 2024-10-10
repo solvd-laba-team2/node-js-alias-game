@@ -96,13 +96,12 @@ class GameService {
     points: number,
   ) {
     const currentGame = this.userScores[gameCode];
-
+    
     if (!currentGame) {
       this.userScores[gameCode] = {};
     }
 
     const currentScore = this.userScores[gameCode][userId] || 0;
-    console.log("Done to this point");
     const updatedScore = currentScore + points;
 
     this.userScores[gameCode][userId] = updatedScore;

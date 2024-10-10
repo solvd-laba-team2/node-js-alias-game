@@ -2,16 +2,18 @@
   <!-- Left column - Players list -->
   <div class="player-list-left">
     <h3>Team A</h3>
+    <h2>Points: 0</h2>
     <ul id="player-list1"></ul>
   </div>
 
   <!-- Center Content -->
   <div class="center-content">
     <h2>Game Room - Chat for Game {{gameName}}</h2>
+
+    <button id="start-game" class="button">Start game</button>
     <!-- Display current round -->
     <h3>Round:</h3>
     <div id="timer" class="timer-box">{{currentTurn}} / {{totalRounds}}</div>
-
     <div class="word-field">
       <h1><img class="loading" src="/assets/loading60.gif" alt="" /></h1>
       <button class="button small-btn">
@@ -24,7 +26,7 @@
         />
       </button>
     </div>
-    
+
     <!-- Timer for the current turn -->
     <div class="timer-container">
       <h3>Time Left:</h3>
@@ -36,7 +38,7 @@
       <p><strong>Describer:</strong> <span id="describer">Waiting...</span></p>
       <p><strong>Guessers:</strong> <span id="guessers">Waiting...</span></p>
     </div>
-
+    
     <button id="swap-team-button" class="button">Swap Team</button>
 
     <!-- Section displaying team messages -->
@@ -74,13 +76,14 @@
   <!-- Right column - Players list -->
   <div class="player-list-right">
     <h3>Team B</h3>
+    <h2>Points: 0</h2>
     <ul id="player-list2"></ul>
   </div>
 </div>
 
-
-{{!-- <script src="/js/"></script> --}}
+{{! <script src="/js/"></script> }}
 <script src="/js/socket.io.js"></script>
 <script src="/js/chat.js"></script>
 <script src="/js/wordGenerator.js"></script>
 <script src="/js/score.js"></script>
+<script src="/js/startGame.js"></script>

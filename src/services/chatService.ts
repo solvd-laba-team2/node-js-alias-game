@@ -122,6 +122,8 @@ export const handleJoinRoom = async (
 
   console.log(data);
   io.to(data.gameId).emit("userJoined", data);
+  io.to(data.gameId).emit("scoreUpdated", data);
+  io.to(data.gameId).emit("new-word");
 };
 export const handleChatMessage = (messageData: MessageData) => {
   const { message, gameId, user } = messageData;
