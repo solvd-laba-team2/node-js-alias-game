@@ -2,8 +2,9 @@ import { Server, Socket } from "socket.io";
 
 import GameService from "../services/gameService";
 import GameLogicService from "../services/gameLogicService";
-import { handleJoinRoom, handleChatMessage } from "../services/chatService";
-import { JoinData, MessageData } from "../types/chatSocket.types";
+// import { handleJoinRoom, handleChatMessage } from "../services/chatService";
+// import { JoinData,
+//   MessageData } from "../types/chatSocket.types";
 
 interface MessageData {
   message: string;

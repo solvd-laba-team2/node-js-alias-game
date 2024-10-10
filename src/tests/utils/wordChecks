@@ -1,0 +1,71 @@
+import { isMessageValid } from "../../utils/wordCheck";
+import * as natural from "natural";
+import { isProfane } from "no-profanity";
+
+// Mockowanie zależności
+jest.mock("no-profanity", () => ({
+    isProfane: jest.fn(),
+}));
+jest.mock("natural", () => ({
+    WordTokenizer: jest.fn().mockImplementation(() => ({
+        tokenize: jest.fn().mockReturnValue(["mocked", "tokenized", "words"]),
+    })),
+    PorterStemmer: {
+        stem: jest.fn(),
+    },
+    LevenshteinDistance: jest.fn(),
+}));
+
+describe("isMessageValid", () => {
+    beforeEach(() => {
+        // Resetowanie mocków przed każdym testem
+        jest.clearAllMocks();
+    });
+
+    it("should return valid for a clean message", () => {
+        const result = isMessageValid("This is a clean message", "target");
+        expect(result).toEqual({ validation: true });
+    });
+
+    it("should detect non-contiguous letters forming the target word", () => {
+        const result = isMessageValid("t a r g e t", "target");
+        expect(result).toEqual({
+            validation: false,
+            cheatWord: "t a r g e t",
+            comment: "Target word hidden in message",
+        });
+    });
+
+    it("should detect a close derivative using PorterStemmer", () => {
+        // Mockowanie PorterStemmer.stem
+        (natural.PorterStemmer.stem as jest.Mock).mockReturnValueOnce("target");
+        const result = isMessageValid("targeted", "target");
+        expect(result).toEqual({
+            validation: false,
+            cheatWord: "targeted",
+            comment: "A close derivative",
+        });
+    });
+
+    it("should detect profanity in the message", () => {
+        // Mockowanie isProfane
+        (isProfane as jest.Mock).mockReturnValueOnce(true);
+        const result = isMessageValid("This is a bad word", "target");
+        expect(result).toEqual({
+            validation: false,
+            cheatWord: "bad",
+            comment: "Profane word",
+        });
+    });
+
+    it("should return invalid when Levenshtein distance is too small", () => {
+        // Mockowanie LevenshteinDistance
+        (natural.LevenshteinDistance as jest.Mock).mockReturnValueOnce(1);
+        const result = isMessageValid("targat", "target");
+        expect(result).toEqual({
+            validation: false,
+            cheatWord: "targat",
+            comment: "Levenshtein distance",
+        });
+    });
+});
