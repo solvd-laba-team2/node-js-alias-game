@@ -24,5 +24,14 @@ const updateScoresOnScreen = () => {
   });
 };
 
-const getWinner = () => team1Score > team2Score ? "Team 1" : "Team 2";
+const getGameResult = () => {
+  if (team1Score > team2Score) {
+    winner = "Team 1 won";
+  } else if (team2Score > team1Score) {
+    winner = "Team 2 won";
+  } else {
+    winner = "Draw"; // If scores are equal, declare a tie
+  }
+  return winner;
+}
 
