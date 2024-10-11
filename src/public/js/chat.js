@@ -71,7 +71,7 @@ const showFinishedGame = () => {
   const gameResult = getGameResult();
   document.querySelector(
     ".game-name",
-  ).innerHTML = `Game is finished \nGame result: ${gameResult || ''}`;
+  ).innerHTML = `Game is finished \nGame result: ${gameResult}`;
 };
 
 socket.on("userJoined", (data) => {

@@ -31,8 +31,10 @@ const getGameResult = () => {
     winner = "Team 1 won";
   } else if (team2Score > team1Score) {
     winner = "Team 2 won";
-  } else {
+  } else if (team1Score > 0 && team1Score === team2Score) {
     winner = "Draw"; // If scores are equal, declare a tie
+  } else {
+    winner - "Unknown";
   }
   return winner;
 };
