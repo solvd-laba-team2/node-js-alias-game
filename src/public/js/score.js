@@ -1,5 +1,6 @@
 const team1ScoreElement = document.querySelector(".player-list-left h2");
 const team2ScoreElement = document.querySelector(".player-list-right h2");
+
 let team1Score = 0;
 let team2Score = 0;
 
@@ -25,6 +26,7 @@ const updateScoresOnScreen = () => {
 };
 
 const getGameResult = () => {
+  let winner;
   if (team1Score > team2Score) {
     winner = "Team 1 won";
   } else if (team2Score > team1Score) {
@@ -33,5 +35,4 @@ const getGameResult = () => {
     winner = "Draw"; // If scores are equal, declare a tie
   }
   return winner;
-}
-
+};

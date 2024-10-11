@@ -17,7 +17,8 @@ const totalRounds = parseInt(form.dataset.totalRounds);
 
 const gameStatus = form.dataset.gameStatus;
 
-const roundTime = parseInt(form.dataset.roundTime);
+// const roundTime = parseInt(form.dataset.roundTime);
+const roundTime = 5;
 
 const usersTeam = "";
 const team1 = { players: [] };
@@ -64,13 +65,14 @@ socket.on("chatMessage", (data) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
-
 const showFinishedGame = () => {
   disableChat();
   hideWordField();
   blockControlButtons();
   const gameResult = getGameResult();
-  document.querySelector(".game-name").innerHTML = `Game is finished \nGame result: ${gameResult}`;
+  document.querySelector(
+    ".game-name",
+  ).innerHTML = `Game is finished \nGame result: ${gameResult || ''}`;
 };
 
 socket.on("userJoined", (data) => {
@@ -136,6 +138,5 @@ socket.on("startGame", () => {
 });
 
 socket.on("endGame", () => {
-  console.log("Trigger end game");
-  window.location.reload();
+  showFinishedGame();
 });

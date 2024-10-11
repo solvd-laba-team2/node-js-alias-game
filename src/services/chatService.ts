@@ -43,7 +43,7 @@ export function checkGuesserMessage(
   const currentWord = GameService.getInstance().getCurrentWord(gameId);
   const socketService = SocketService.getInstance();
   if (currentWord === message.toLowerCase()) {
-    handleWordGuessed(gameId, user, 2);
+    handleWordGuessed(gameId, user, 1);
     socketService.emitToGameRoom(gameId, "wordGuessed", {});
     socketService.emitToGameRoom(gameId, "systemMessage", "Correct!");
     socketService.emitToGameRoom(gameId, "scoreUpdated", {});
