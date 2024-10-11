@@ -17,8 +17,7 @@ const totalRounds = parseInt(form.dataset.totalRounds);
 
 const gameStatus = form.dataset.gameStatus;
 
-// const roundTime = parseInt(form.dataset.roundTime);
-const roundTime = 5;
+const roundTime = parseInt(form.dataset.roundTime);
 
 const usersTeam = "";
 const team1 = { players: [] };
