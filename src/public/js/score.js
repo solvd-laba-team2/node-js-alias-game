@@ -28,9 +28,9 @@ const updateScoresOnScreen = () => {
 const getGameResult = () => {
   let winner;
   if (team1Score > team2Score) {
-    winner = "Team 1 won";
+    winner = "Team A won";
   } else if (team2Score > team1Score) {
-    winner = "Team 2 won";
+    winner = "Team B won";
   } else if (team1Score > 0 && team1Score === team2Score) {
     winner = "Draw"; // If scores are equal, declare a tie
   } else {
