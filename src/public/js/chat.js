@@ -5,24 +5,51 @@ const messages = document.querySelector(".chat-messages");
 const form = document.getElementById("chat-form");
 const input = document.getElementById("message-input");
 const swapTeamButton = document.getElementById("swap-team-button");
+const roundsElement = document.getElementById("rounds");
 
 const playersList1 = document.getElementById("player-list1");
 const playersList2 = document.getElementById("player-list2");
 // Use data attributes to pass dynamic data
 const gameId = form.dataset.gameId;
 const currentUser = form.dataset.currentUser;
+
+const totalRounds = parseInt(form.dataset.totalRounds);
+
+const gameStatus = form.dataset.gameStatus;
+
+const roundTime = parseInt(form.dataset.roundTime);
+
 const usersTeam = "";
 const team1 = { players: [] };
 const team2 = { players: [] };
 
 const data = { gameId, user: currentUser, usersTeam, team1, team2 };
 
+let describer;
+let guessers;
+let currentTeam;
+
+let targetWord;
+
 socket.emit("join room", data);
 
 form.addEventListener("submit", (e) => {
   e.preventDefault(); // Prevent the page from refreshing
+  let role;
+  if (!describer) {
+    role = "unknown"; // game has not started
+  } else {
+    role = currentUser === describer ? "describer" : "guesser";
+  }
   const message = input.value;
-  socket.emit("chatMessage", { message, ...data });
+  if (message !== "") {
+    socket.emit("chatMessage", {
+      message,
+      ...data,
+      role,
+      targetWord: targetWord || null,
+    });
+  }
   input.value = "";
 });
 
@@ -31,34 +58,48 @@ swapTeamButton.addEventListener("click", () => {
   socket.emit("swapTeam", data);
 });
 
-
 // Listen for chat messages from the server
 socket.on("chatMessage", (data) => {
   messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
+const showFinishedGame = () => {
+  disableChat();
+  hideWordField();
+  blockControlButtons();
+  const gameResult = getGameResult();
+  document.querySelector(
+    ".game-name",
+  ).innerHTML = `Game is finished \nGame result: ${gameResult}`;
+};
+
 socket.on("userJoined", (data) => {
+  if (gameStatus === "finished") {
+    showFinishedGame();
+    return;
+  }
+  console.log("gameStatus", gameStatus);
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 
-  playersList1.innerHTML = '';
-  playersList2.innerHTML = '';
+  playersList1.innerHTML = "";
+  playersList2.innerHTML = "";
 
   // Populate team1 players
-  data.team1.players.forEach(player => {
-    const li = document.createElement('li');
+  data.team1.players.forEach((player) => {
+    const li = document.createElement("li");
     li.textContent = player;
     playersList1.appendChild(li);
   });
 
   // Populate team2 players
-  data.team2.players.forEach(player => {
-    const li = document.createElement('li');
+  data.team2.players.forEach((player) => {
+    const li = document.createElement("li");
     li.textContent = player;
     playersList2.appendChild(li);
   });
-
+  loadCurrentTurn();
 });
 
 socket.on("systemMessage", (message) => {
@@ -66,33 +107,35 @@ socket.on("systemMessage", (message) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 });
 
-// Listen for new turn and role assignments
-socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
-  console.log(`New describer: ${describer}, guessers: ${guessers}`);
-});
+const hideWordField = () => {
+  document.querySelector(".word-field").style.display = "none";
+};
 
-let timeLeft = 60; // Start timer at 60 seconds
-const timerElement = document.getElementById("timer");
+const showWordField = () => {
+  document.querySelector(".word-field").style.display = "flex";
+};
 
-const startTimer = () => {
-  const interval = setInterval(() => {
-    if (timeLeft <= 0) {
-      clearInterval(interval);
-      // Emit to the server that the time is up
-      socket.emit("timeUp", gameId);
-    } else {
-      timeLeft--;
-      timerElement.textContent = timeLeft;
-    }
-  }, 1000);
+const hideUpdate = () => {
+  document.querySelector("#update-word").style.display = "none";
+};
+
+const showUpdate = () => {
+  document.querySelector("#update-word").style.display = "inline-block";
 };
 
 // Listen for new turn event to reset timer and update roles
-socket.on("newTurn", (data) => {
-  const { describer, guessers } = data;
-  document.getElementById("describer").textContent = describer;
-  document.getElementById("guessers").textContent = guessers.join(", ");
-  timeLeft = 60; // Reset timer for the new turn
-  startTimer(); // Start the timer for the new turn
+socket.on("newTurn", (currentRound) => {
+  console.log("newTurn event");
+  roundsElement.innerHTML = `${currentRound} / ${totalRounds}`;
+  loadCurrentTurn();
+});
+
+socket.on("startGame", () => {
+  console.log("startGame event");
+  blockControlButtons();
+  loadCurrentTurn();
+});
+
+socket.on("endGame", () => {
+  showFinishedGame();
 });
