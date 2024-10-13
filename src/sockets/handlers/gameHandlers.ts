@@ -11,12 +11,13 @@ export const startGame = async (
   startTimer(gameCode, seconds, totalRounds);
 };
 
-export const handleWordGuessed = async (
-  gameId: string,
-  userId: string,
-  points: number,
-) => {
+export const handleWordGuessed = async (data: {
+  gameId: string;
+  userId: string;
+  points: number;
+}) => {
   try {
+    const { gameId, userId, points } = data;
     await GameService.getInstance().updateUserScoreInMemory(
       userId,
       gameId,

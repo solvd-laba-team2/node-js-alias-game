@@ -65,7 +65,6 @@ export const handleChatMessage = (messageData: MessageData) => {
 
 
 export const handleSwapTeam = async (
-  socket: Socket,
   data: JoinData,
 ) => {
   const game = await GameService.getInstance().getGame(data.gameId);
