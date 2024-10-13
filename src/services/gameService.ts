@@ -11,6 +11,7 @@ class GameService {
   private static _instance: GameService | null = null;
   // active games and users collection
   private activeGames: Map<string, IGame> = new Map();
+
   private userScores: Record<string, Record<string, number>> = {};
 
   private currentWords: Record<string, string> = {};
