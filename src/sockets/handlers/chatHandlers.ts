@@ -4,7 +4,7 @@ import { isMessageValid } from "../../utils/wordCheck";
 import GameService from "../../services/gameService";
 import SocketService from "../../services/socketService";
 import GameLogicService from "../../services/gameLogicService";
-import { checkGuesserMessage } from "../../services/chatService";
+import chatService from "../../services/chatService";
 
 export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
   socket.join(data.gameId);
@@ -59,14 +59,11 @@ export const handleChatMessage = (messageData: MessageData) => {
 
   if (role === "guesser") {
     // If user is not describer, so he is guesser
-    checkGuesserMessage(gameId, message, user);
+    chatService.checkGuesserMessage(gameId, message, user);
   }
 };
 
-
-export const handleSwapTeam = async (
-  data: JoinData,
-) => {
+export const handleSwapTeam = async (data: JoinData) => {
   const game = await GameService.getInstance().getGame(data.gameId);
 
   if (game.team1.players.includes(data.user)) {
