@@ -9,9 +9,11 @@ export const createUser = async (
   try {
     const newUser = await User.create(req.body);
     console.log("User created:\n", newUser);
+    res.status(201).json({ username: newUser.username, stats: newUser.stats });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error.message);
+      res.status(500).json({ error: error.message });
     }
   }
 };
@@ -71,14 +73,14 @@ export const putNewPassword = async (req: Request, res: Response): Promise<any> 
       console.log(`No user with username: ${username}, logged out`);
       res.clearCookie("username");
       res.clearCookie("token");
-      return res.render("login", { title: "Login", page: "login", errorMessage: null });
+      return res.status(401).render("login", { title: "Login", page: "login", errorMessage: null });
     }
     const hashed = await bcrypt.hash(req.body.password, 13);
     await user.updateOne({ password: hashed });
 
     console.log("New password successfully set for user:", user);
 
-    return res.render("user", {
+    return res.status(200).render("user", {
       title: "Profile",
       page: "user",
       successMessage: "Password updated successfully!",

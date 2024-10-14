@@ -4,16 +4,15 @@ import chatService from "./chatService";
 import SocketService from "../services/socketService";
 import { getOriginalId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
-import GameLogicService from "./gameLogicService";
-
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
-  // active games and users collection
-  private activeGames: Map<string, IGame> = new Map();
-  private userScores: Map<string, number> = new Map();
+
+  private userScores: Record<string, Record<string, number>> = {};
 
   private currentWords: Record<string, string> = {};
+
+  private gamesTurns = {};
 
   private constructor() {
     this.socketService = SocketService.getInstance();
@@ -39,8 +38,8 @@ class GameService {
       roundTime,
       totalRounds,
       status: "creating",
-      team1: { players: [], chatID: "", score: [] },
-      team2: { players: [], chatID: "", score: [] },
+      team1: { players: [], chatID: "", score: 0 },
+      team2: { players: [], chatID: "", score: 0 },
       currentTurn: 0, // Setting the current turn
       createdAt: new Date(), // Setting the creation date
     });
@@ -55,9 +54,10 @@ class GameService {
     return newGame; // Return the new game
   }
 
-  // Get a game by gameId
+  // Get a game by gameCode
   async getGame(gameId: string): Promise<IGame | null> {
-    const game = await gameModel.findById(getOriginalId(gameId)); // Find the game in the database by ID
+    const originalId = getOriginalId(gameId);
+    const game = await gameModel.findById(originalId); // Find the game in the database by ID
     return game; // Return the game (can be null if not found)
   }
   // Get all games
@@ -68,7 +68,6 @@ class GameService {
     return games;
   }
 
-
   // Add a user to the game
   async addUser(gameId: string, teamId: "team1" | "team2", username: string) {
     const game = await gameModel.findById(getOriginalId(gameId));
@@ -77,144 +76,115 @@ class GameService {
     await game.save();
   }
 
-
   async rmUser(gameId: string, teamId: "team1" | "team2", username: string) {
     const game = await gameModel.findById(getOriginalId(gameId));
     if (!game) throw new Error("Game not found");
     if (teamId === "team1") {
-      game.team1.players = game.team1.players.filter(e => e !== username);
+      game.team1.players = game.team1.players.filter((e) => e !== username);
     } else if (teamId === "team2") {
-      game.team2.players = game.team2.players.filter(e => e !== username);
+      game.team2.players = game.team2.players.filter((e) => e !== username);
     } else {
       throw new Error("User not found in either team");
     }
     await game.save();
   }
 
+  async updateUserScoreInMemory(
+    userId: string,
+    gameCode: string,
+    points: number,
+  ) {
+    const currentGame = this.userScores[gameCode];
 
-  async updateUserScoreInMemory(userId: string, gameId: string, points: number) {
-    const currentScore = this.userScores.get(userId) || 0;
+    if (!currentGame) {
+      this.userScores[gameCode] = {};
+    }
 
+    const currentScore = this.userScores[gameCode][userId] || 0;
     const updatedScore = currentScore + points;
-    this.userScores.set(userId, updatedScore);
 
-    this.socketService.emitToGameRoom(gameId, "scoreUpdated", {
+    this.userScores[gameCode][userId] = updatedScore;
+
+    this.socketService.emitToGameRoom(gameCode, "scoreUpdated", {
       userId,
       score: updatedScore,
     });
   }
 
+  getUserScore(gameCode: string, userId: string): number {
+    const currentGame = this.userScores[gameCode] || {};
+    const userScore = currentGame[userId] || 0;
+    return userScore;
+  }
 
-  async saveUserScoresToDatabase(gameId: string): Promise<void> {
-    const game = this.getActiveGame(gameId);
+  async getCurrentScores(gameCode) {
+    const game = await this.getGame(gameCode);
+    if (game.status === "finished") {
+      const { team1, team2 } = game;
+      return { team1: team1.score, team2: team2.score };
+    }
+    const team1Score = game.team1.players.reduce((score, player) => {
+      return score + this.getUserScore(gameCode, player);
+    }, 0);
+
+    const team2Score = game.team2.players.reduce((score, player) => {
+      return score + this.getUserScore(gameCode, player);
+    }, 0);
+    return { team1: team1Score, team2: team2Score };
+  }
+
+  async saveUserScoresToDatabase(gameCode: string): Promise<void> {
+    const game = await this.getGame(gameCode);
     if (!game) throw new Error("Game not found");
 
+    const currentGameScores = this.userScores[gameCode] || {};
+    const teamScores = await this.getCurrentScores(gameCode);
+    console.log(teamScores);
+    const team1players = game.team1.players;
+    const team2players = game.team2.players;
+    const winnerTeam =
+      teamScores.team1 > teamScores.team2 ? team1players : team2players;
+
+    game.team1.score = teamScores.team1;
+    game.team2.score = teamScores.team2;
 
     // Iterate over both teams and save user scores to the database
-    for (const team of [game.team1, game.team2]) {
-      for (const player of team.players) {
-        const user = await userModel.findOne({ username: player });
-        if (user) {
-          const score = this.userScores.get(player) || 0;
-          user.stats.wordsGuessed += score;
+    for (const player of [...team1players, ...team2players]) {
+      const user = await userModel.findOne({ username: player });
+      if (user) {
+        user.stats.wordsGuessed += currentGameScores[player] || 0;
+        if (game.status === "finished") {
           user.stats.gamesPlayed += 1;
-
-          if (game.status === "finished") {
+          if (winnerTeam.includes(player)) {
             user.stats.gamesWon += 1;
           }
-
-          await user.save();
-
-          this.userScores.delete(player);
         }
+        await user.save();
       }
     }
+    await game.save();
+
+    if (this.userScores[gameCode]) {
+      delete this.userScores[gameCode];
+    }
   }
 
-
-
-
-  async startTurn(gameId: string): Promise<IGame> {
-    let game = this.getActiveGame(gameId);
-
-    if (!game) {
-      game = await gameModel.findById(getOriginalId(gameId));
-      if (!game) throw new Error("Game not found");
-    }
-
-    const { describer, guessers, team } = GameLogicService.startTurn(game);
-
-    if (!describer) {
-      await this.endGame(gameId);
-      return;
-    }
-
-    this.socketService.emitToGameRoom(gameId, "turnStarted", {
-      describer,
-      guessers,
-      team
-    });
-
-    this.updateGameState(game);
-
-    return game;
-  }
-
-
-  async endGame(gameId: string): Promise<void> {
-    const game = this.getActiveGame(gameId);
+  async endGame(gameCode: string): Promise<void> {
+    const game = await this.getGame(gameCode);
 
     if (!game) throw new Error("Game not found");
+    await this.saveUserScoresToDatabase(gameCode);
 
     game.status = "finished";
-
-    await this.saveUserScoresToDatabase(gameId);
-    this.activeGames.delete(gameId);
-
-    this.socketService.emitToGameRoom(gameId, "gameEnded", {
-      message: "The game has ended!",
-    });
+    await chatService.saveChatHistory(gameCode);
+    await game.save();
   }
 
-
-
-
-  // Add a message to the game's chat
-  async addMessage(
-    gameId: string,
-    sender: string,
-    message: string,
-    type: "description" | "message",
-  ) {
-    await chatService.addMessageToChat(gameId, sender, message, type);
-
-    // Emit chat message to all players in the game room
-    this.socketService.emitToGameRoom(gameId, "chatMessage", {
-      sender,
-      message,
-    });
-  }
-
-  // Get chat history for the game
-  async getChatHistory(gameId: string) {
-    return await chatService.getChatHistory(gameId); // Retrieve chat history from chatService
-  }
-
-  // Method to fetch an active game from memory
-  private getActiveGame(gameId: string): IGame | null {
-    return this.activeGames.get(gameId) || null;
-  }
-
-  // Method to update the current state of the game in memory
-  private updateGameState(game: IGame): void {
-    this.activeGames.set(game._id.toString(), game);
-  }
   // Get only games with status "creating"
   async getOnlyNotStartedGames(): Promise<IGame[] | null> {
     const games = await gameModel.find({ status: "creating" }).lean();
     return games;
   }
-
 
   getCurrentWord(gameCode: string): string | null {
     const currentWord = this.currentWords[gameCode];
@@ -225,13 +195,48 @@ class GameService {
   }
 
   async generateWord(gameCode: string): Promise<string> {
-    const gameId = getOriginalId(gameCode);
-    const game = await this.getGame(gameId);
+    const game = await this.getGame(gameCode);
     const gameDifficulty = game.difficulty;
     const word = generateWord(difficultyWordOptions[gameDifficulty]);
     this.currentWords[gameCode] = word;
     return word;
   }
+
+  async switchTurn(gameCode: string) {
+    const game = await this.getGame(gameCode);
+    if (!game) throw new Error("Game not found");
+
+    const currentTeam = game.currentTurn % 2 === 0 ? "team1" : "team2";
+    const currentPlayers = game[currentTeam].players;
+    const currentDescriber = this.getRandomUser(currentPlayers);
+    const guessers = currentPlayers.filter(
+      (player) => player !== currentDescriber,
+    );
+
+    await gameModel.findByIdAndUpdate(
+      game._id,
+      { $inc: { currentTurn: 1 } }, // Increment currentTurn by 1
+      { new: true, runValidators: true },
+    );
+
+    const turnData = { currentTeam, describer: currentDescriber, guessers };
+    this.gamesTurns[gameCode] = turnData;
+    return turnData;
+  }
+
+  getCurrentTurn(gameCode: string) {
+    return this.gamesTurns[gameCode] || null;
+  }
+
+  getRandomUser(users: string[]) {
+    const user = users[Math.floor(Math.random() * users.length)];
+    return user || null;
+  };
+
+  getRandomTeam(): "team1" | "team2" {
+    const team = Math.random() < 0.5 ? "team1" : "team2";
+    return team || null;
+  };
 }
 
 export default GameService;
