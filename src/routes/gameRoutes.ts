@@ -22,11 +22,11 @@ router.get(
     gameController.updateScore,
 );
 
-// Route to get the chat history for a specific game1
-//router.get("/:gameId/chat", gameController.getChatHistory); // no chatHistory yet
+// Route to get the chat history for a specific game
+router.get("/:gameCode/chat", gameController.getChatHistory);
 
-// Route to send a message in the game's chat1
-//router.post("/:gameId/chat/send", gameController.addMessageToChat); // no as well
+// Route to send a message in the game's chat
+router.post("/:gameCode/chat/send", gameController.addMessageToChat);
 
 // Route to render the room page for a specific game1
 router.get("/:gameId", verifyToken, gameController.renderRoomPage);
