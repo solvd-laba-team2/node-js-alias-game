@@ -28,22 +28,22 @@ router.get(
 // Route to send a message in the game's chat1
 //router.post("/:gameId/chat/send", gameController.addMessageToChat); // no as well
 
-// Route to render the room page for a specific game
+// Route to render the room page for a specific game1
 router.get("/:gameId", verifyToken, gameController.renderRoomPage);
 
-// Route to generate a new word for the game
+// Route to generate a new word for the game1
 router.get("/:gameCode/generateWord", gameController.getGenerateWord);
 
-// Route to get the current teams for a game
+// Route to get the current teams for a game1
 router.get("/:gameCode/getTeams", gameController.getTeams);
 
-// Route to get the current word in play for a game
+// Route to get the current word in play for a game1
 router.get("/:gameCode/currentWord", gameController.getCurrentWord);
 
-// Route to get the current scores for a game
+// Route to get the current scores for a game1
 router.get("/:gameCode/scores", gameController.getCurrentScores);
 
-// Route to switch the turn to the next team/player
+// Route to switch the turn to the next team/player1
 router.get("/:gameCode/switchTurn", gameController.switchTurn);
 
 // Route to get the current turn's team/player for a game
