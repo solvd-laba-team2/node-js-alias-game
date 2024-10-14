@@ -8,7 +8,7 @@
     "copy-assets": "copyfiles -u 1 src/public/**/* src/views/**/* src/views/* dist/",
     "dev": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node dist/server.js"
+    "start": "ts-node src/server.ts"
   },
   "keywords": [],
   "author": "",
