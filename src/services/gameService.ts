@@ -143,10 +143,14 @@ class GameService {
 
     const currentGameScores = this.userScores[gameCode] || {};
     const teamScores = await this.getCurrentScores(gameCode);
+    console.log(teamScores);
     const team1players = game.team1.players;
     const team2players = game.team2.players;
     const winnerTeam =
       teamScores.team1 > teamScores.team2 ? team1players : team2players;
+
+    game.team1.score = teamScores.team1;
+    game.team2.score = teamScores.team2;
 
     // Iterate over both teams and save user scores to the database
     for (const player of [...team1players, ...team2players]) {
@@ -162,6 +166,7 @@ class GameService {
         await user.save();
       }
     }
+    await game.save();
 
     if (this.userScores[gameCode]) {
       delete this.userScores[gameCode];
@@ -198,11 +203,10 @@ class GameService {
     const game = await this.getGame(gameCode);
 
     if (!game) throw new Error("Game not found");
-
+    await this.saveUserScoresToDatabase(gameCode);
+    
     game.status = "finished";
     await game.save();
-
-    await this.saveUserScoresToDatabase(gameCode);
   }
 
   // Add a message to the game's chat

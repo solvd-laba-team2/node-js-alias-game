@@ -14,14 +14,13 @@ const createNewWord = () => {
 
 const getGameResult = () => {
   let winner;
+  console.log(team1Score, team2Score);
   if (team1Score > team2Score) {
     winner = "Team A won";
   } else if (team2Score > team1Score) {
     winner = "Team B won";
-  } else if (team1Score > 0 && team1Score === team2Score) {
-    winner = "Draw"; // If scores are equal, declare a tie
   } else {
-    winner = "Unknown";
+    winner = "Draw";
   }
   return winner;
 };
@@ -30,6 +29,9 @@ const showFinishedGame = () => {
   disableChat();
   hideWordField();
   blockControlButtons();
+};
+
+const showFinishedGameResult = () => {
   const gameResult = getGameResult();
   document.querySelector(
     ".game-name",
@@ -46,6 +48,9 @@ const updateScoresOnScreen = () => {
           team1Score = scores.team1;
           team2ScoreElement.innerText = "Points: " + scores.team2;
           team2Score = scores.team2;
+          if (gameStatus === "finished") {
+            showFinishedGameResult();
+          }
         }
       });
     }
@@ -113,7 +118,6 @@ const switchTurn = () => {
 
 //Listeners performers
 
-
 const generateWordPerformer = (e) => {
   e.preventDefault();
   createNewWord();
@@ -156,9 +160,9 @@ const timerTickHandler = (seconds) => {
   timerElement.innerHTML = seconds;
 };
 
-const wordGuessedHandler = () =>{
-    createNewWord();
-}
+const wordGuessedHandler = () => {
+  createNewWord();
+};
 
 const scoreUpdatedHandler = (data) => {
   console.log(`Score updated`);
