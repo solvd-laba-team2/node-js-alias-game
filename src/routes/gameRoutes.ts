@@ -26,10 +26,10 @@ router.get(
 );
 
 // Route to get the chat history for a specific game
-router.get("/:gameId/chat", gameController.getChatHistory);
+router.get("/:gameCode/chat", gameController.getChatHistory);
 
 // Route to send a message in the game's chat
-router.post("/:gameId/chat/send", gameController.addMessageToChat);
+router.post("/:gameCode/chat/send", gameController.addMessageToChat);
 
 // Route to start a new turn in the game
 router.get("/:gameId/startTurn", gameController.startTurn);
