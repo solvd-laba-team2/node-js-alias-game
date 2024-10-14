@@ -3,7 +3,6 @@ import { JoinData, MessageData } from "../../types/chatSocket.types";
 import { isMessageValid } from "../../utils/wordCheck";
 import GameService from "../../services/gameService";
 import SocketService from "../../services/socketService";
-import GameLogicService from "../../services/gameLogicService";
 import chatService from "../../services/chatService";
 
 export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
@@ -18,7 +17,7 @@ export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
       game.team2.players.includes(data.user)
     )
   ) {
-    const team = GameLogicService.getRandomTeam();
+    const team = GameService.getInstance().getRandomTeam();
     data.usersTeam = team;
     await GameService.getInstance().addUser(data.gameId, team, data.user);
   } else {

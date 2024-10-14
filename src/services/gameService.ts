@@ -4,13 +4,9 @@ import chatService from "./chatService";
 import SocketService from "../services/socketService";
 import { getOriginalId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
-import GameLogicService from "./gameLogicService";
-
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
-  // active games and users collection
-  private activeGames: Map<string, IGame> = new Map();
 
   private userScores: Record<string, Record<string, number>> = {};
 
@@ -173,32 +169,6 @@ class GameService {
     }
   }
 
-  async startTurn(gameId: string): Promise<IGame> {
-    let game = this.getActiveGame(gameId);
-
-    if (!game) {
-      game = await gameModel.findById(getOriginalId(gameId));
-      if (!game) throw new Error("Game not found");
-    }
-
-    const { describer, guessers, team } = GameLogicService.startTurn(game);
-
-    if (!describer) {
-      await this.endGame(gameId);
-      return;
-    }
-
-    this.socketService.emitToGameRoom(gameId, "newTurn", {
-      describer,
-      guessers,
-      team,
-    });
-
-    this.updateGameState(game);
-
-    return game;
-  }
-
   async endGame(gameCode: string): Promise<void> {
     const game = await this.getGame(gameCode);
 
@@ -210,15 +180,6 @@ class GameService {
     await game.save();
   }
 
-  // Method to fetch an active game from memory
-  private getActiveGame(gameId: string): IGame | null {
-    return this.activeGames.get(gameId) || null;
-  }
-
-  // Method to update the current state of the game in memory
-  private updateGameState(game: IGame): void {
-    this.activeGames.set(game._id.toString(), game);
-  }
   // Get only games with status "creating"
   async getOnlyNotStartedGames(): Promise<IGame[] | null> {
     const games = await gameModel.find({ status: "creating" }).lean();
@@ -252,7 +213,7 @@ class GameService {
       (player) => player !== currentDescriber,
     );
 
-    const updatedGame = await gameModel.findByIdAndUpdate(
+    await gameModel.findByIdAndUpdate(
       game._id,
       { $inc: { currentTurn: 1 } }, // Increment currentTurn by 1
       { new: true, runValidators: true },
@@ -270,7 +231,12 @@ class GameService {
   getRandomUser(users: string[]) {
     const user = users[Math.floor(Math.random() * users.length)];
     return user || null;
-  }
+  };
+
+  getRandomTeam(): "team1" | "team2" {
+    const team = Math.random() < 0.5 ? "team1" : "team2";
+    return team || null;
+  };
 }
 
 export default GameService;

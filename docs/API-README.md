@@ -5,41 +5,82 @@ This API is designed for the Alias game, a multiplayer word-guessing game where 
 
 ## Project Structure
 
-```
-alias-game-api/
+```md
+
+src/
+├── config/
+│   ├── handlebars.ts
+│   ├── middleware.ts
+│   ├── mongoose.ts
+│   ├── routes.ts
+│   └── socket.ts
 │
 ├── controllers/
-│   ├── authController.js        # Authentication and login
-│   ├── gameController.js        # Game logic (rooms, gameplay)
-│   ├── chatController.js        # Game chat functionality
-│   └── scoreController.js       # Scores and statistics
+│   ├── authController.ts
+│   ├── gameController.ts
+│   └── userController.ts
+│
+├── middleware/
+│   ├── checkAuth.ts
+│   └── verifyToken.ts
 │
 ├── models/
-│   ├── userModel.js             # User model
-│   ├── gameModel.js             # Game model (rooms, players)
-│   ├── chatModel.js             # Chat model
-│   └── scoreModel.js            # Scores model
+│   ├── chatModel.ts
+│   ├── gameModel.ts
+│   └── userModel.ts
+│
+├── public/
+│   └─ assets/
+│       ├── css/
+|       |    └── styles.css
+│       └── js/
+│           ├── elementsDisplay.js
+│           ├── formValidation.js
+│           ├── handlers.js
+│           ├── joining-room.js
+│           ├── listeners.js
+│           ├── loadData.js
+│           └── socket.io.js    
 │
 ├── routes/
-│   ├── authRoutes.js            # Authentication routes
-│   ├── gameRoutes.js            # Game routes
-│   ├── chatRoutes.js            # Chat routes
-│   └── scoreRoutes.js           # Score routes
+│   ├── authRoutes.ts
+│   ├── gameRoutes.ts
+│   └── userRoutes.ts
 │
-├── config/
-│   ├── database.js              # Database configuration
-│   ├── middleware.js            # Middleware (e.g., JWT authentication)
-│   └── routes.js                # Combining all routes
+├── services/
+│   ├── chatService.ts
+│   ├── gameLogicService.ts
+│   ├── gameService.ts
+│   └── socketService.ts
 │
-├── server.js                    # Server entry point
-├── package.json                 # Project dependencies
-└── .env                         # Environment variables (e.g., JWT keys, database URL)
+├── sockets/
+│   ├── handlers/
+│   │   ├── chatHandlers.ts
+│   │   └── gameHandlers.ts
+│   ├── chat.ts
+│   └── game.ts
+│
+├── types/
+│   └── chatSocket.types.ts
+│
+├── utils/
+│   ├── hash.ts
+│   ├── randomWords.ts
+│   └── wordCheck.ts
+│
+├── views/
+│
+├── app.ts
+└── server.ts
+
 ```
 
 ## API Endpoints
 
 ### Auth Endpoints
+
 #### 1. **GET** `/login` - Render Login Page
+
 - **Description:** Displays the login page for the user.
 - **Response:**
   - Renders the login page with a form to submit login credentials.
@@ -47,6 +88,7 @@ alias-game-api/
 ---
 
 #### 2. **GET** `/register` - Render Register Page
+
 - **Description:** Displays the registration page for the user.
 - **Response:**
   - Renders the registration page with a form to create a new account.
@@ -54,6 +96,7 @@ alias-game-api/
 ---
 
 #### 3. **POST** `/login` - User Login
+
 - **Description:** Logs in the user by verifying credentials and creating a JWT token.
 - **Request Body:**
   - `username`: string (required)
@@ -65,6 +108,7 @@ alias-game-api/
   - **500 Internal Server Error**: If something went wrong on the server side.
   
 - **Example:**
+
   ```json
   {
     "username": "johndoe",
@@ -75,6 +119,7 @@ alias-game-api/
 ---
 
 #### 4. **POST** `/register` - User Registration
+
 - **Description:** Registers a new user by creating a new user record and generating a JWT token.
 - **Request Body:**
   - `username`: string (required)
@@ -85,9 +130,21 @@ alias-game-api/
   - **400 Bad Request**: If the username already exists, renders the registration page with an error message.
   - **500 Internal Server Error**: If something went wrong during the registration process.
 
+---
+
+#### 5. **GET** `/logout` - User Logout
+
+- **Description:** Logs out current user and clears out the JWT token
+- **Request Body:**
+  - No request body
+  
+- **Response:**
+  - **200 OK**: Redirects to the home page upon successful logout with no token (unauthenticated).
 
 ### User Endpoints
+
 #### 1. **POST** `/user` - Create a New User
+
 - **Description:** Creates a new user by saving the user information in the database.
 - **Request Body:**
   - `username`: string (required)
@@ -97,7 +154,8 @@ alias-game-api/
   - **200 OK**: The user is successfully created.
   - **500 Internal Server Error**: If something went wrong during user creation.
 
-- **Example:**
+- **Example Rrequest Body:**
+
   ```json
   {
     "username": "johndoe",
@@ -105,57 +163,64 @@ alias-game-api/
   }
   ```
 
-#### 2. **GET** `/user/profile` - Get User Data
-- **Description:** Fetches user data from the database by `username`.
-- **Request Body:**
-  - `username`: string (required); the username of the user.
-
-- **Response:**
-  - **200 OK**: Returns the user details.
-  - **404 Not Found**: If the user is not found.
-  - **500 Internal Server Error**: If something went wrong on the server.
-
-- **Example Request:**
-  ```json
-  {
-    "username": "johndoe"
-  }
-  ```
 - **Example Response:**
+
   ```json
   {
     "username": "johndoe",
-    "gamesPlayed": 5,
-    "gamesWon": 2,
-    "wordsGuessed": 15
+    "stats": {
+        "gamesPlayed": 0,
+        "gamesWon": 0,
+        "wordsGuessed": 0
+    }
   }
   ```
+
+---
+
+#### 2. **GET** `/user` - Get User Data
+
+- **Description:** Fetches user data from the database by `username` kept in the session and renders user profile page.
+- **Request Body:**
+  - No request body
+
+- **Response:**
+  - **200 OK**: Renders user profile page.
+  - **500 Internal Server Error**: If something went wrong on the server.
+
+---
+
 #### 3. **PUT** `/user` - Update User Password
+
 - **Description:** Updates the password for the authenticated user.
 - **Request Body:**
   - `password`: string (required); the new password to be set.
 
 - **Response:**
   - **200 OK**: If the password was successfully updated.
-  - **404 Not Found**: If the user with the provided `username` is not found.
+  - **401 Not Found**: Renders the login page with no error message.
   - **500 Internal Server Error**: If an error occurred while updating the password.
 
 - **Example Request:**
+
   ```json
   {
     "password": "newsecurepassword"
   }
   ```
+
 - **Example Response:**
+
   ```json
   {
   "message": "Password updated successfully!"
   }
   ```
 
-
 ### Game Endpoints
+
 #### 1. **POST** `game/create` - Create Game
+
 - **Description:** Creates a new game based on the provided settings like game name, difficulty, round time, and total rounds.
 
 - **Request Body:**
@@ -167,12 +232,12 @@ alias-game-api/
   - `roundTime`: number (required) - Time in seconds for each round.
   - `totalRounds`: number (required) - Total number of rounds to play.
 
-
 - **Response:**
   - **200 OK**: Redirects to the newly created game room with the shortened game ID.
   - **500 Internal Server Error**: If an error occurs during game creation.
 
 - **Example Request Body:**
+
   ```json
   {
     "gameName": "Alias Challenge",
@@ -180,46 +245,39 @@ alias-game-api/
     "roundTime": 60,
     "totalRounds": 5
   }
+  ```
+
+---
+
 #### 2. **GET** `game/join` - Render Join Game Page
 
-- **Description:** 
+- **Description:**
   Renders the page for users to join an existing game. This endpoint retrieves all the games that are not started yet and displays them to the user.
-
 
 - **Response:**
   - **200 OK**: Renders the `join-game` view with the list of available games. If there are no games available, an empty list is provided.
-  
-- **Example Request:**
-  ```http
-  GET /join HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
+
+---
 
 #### 3. **GET** `game/create` - Render Create Game Form
 
-- **Description:** 
+- **Description:**
   Renders the form for creating a new game. This endpoint allows users to access the game creation interface where they can input details like the game name, difficulty, round time, and total rounds.
 
-- **Request Body:** 
+- **Request Body:**
   - No request body is needed for this endpoint.
 
 - **Response Body:**
   - **200 OK**: Renders the `create-game` view, which contains the form for game creation.
 
-- **Example Request:**
-  ```http
-  GET /create HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
+---
+
 #### 4. **POST** `game/join` - Join a Game
 
 - **Description:**
   Allows a user to join an existing game by submitting the game code. The server checks if the game exists and redirects the user to the game room if successful.
 
 - **Request Body:**
-  - **Content-Type:** `application/json`
   - **Required Fields:**
     - `gameCode` (string): The unique code of the game that the user wants to join.
 - **Response Body:**
@@ -227,57 +285,16 @@ alias-game-api/
   - **404 Not Found**: Returns an error message if the game with the specified game code does not exist.
 
 - **Example Request:**
-  ```http
-  POST /join HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  Content-Type: application/json
 
+  ```json
   {
       "gameCode": "123456"
   }
   ```
-- **Example Response:**
-  ```http
-    HTTP/1.1 200 OK
-    Location: /game/123456
-  ```
 
-#### 5. **POST** `game/addUser` - Add a User to the Game
+---
 
-- **Description:**
-  Adds a specified user to a game and assigns them to a team. The request must include the game ID, username, and team ID. 
-
-- **Request Body:**
-  - **Content-Type:** `application/json`
-  - **Required Fields:**
-    - `gameId` (string): The ID of the game to which the user is being added.
-    - `username` (string): The name of the user being added.
-    - `teamId` (string): The ID of the team to which the user will be assigned.
-
-- **Response Body:**
-  - **200 OK**: Returns a success message indicating that the user has been added.
-  - **500 Internal Server Error**: Returns an error message if there was an issue adding the user to the game.
-
-- **Example Request:**
-  ```http
-  POST /addUser HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  Content-Type: application/json
-
-  {
-      "gameId": "123456",
-      "username": "player1",
-      "teamId": "team1"
-  }
-- **Example Response:**
-  ```json
-  {
-      "message": "player1 added to the game"
-  }
-  ```
-#### 6. **GET** `game/:gameId/chat` - Get Chat History for a Game
+#### 5. **GET** `game/:gameId/chat` - Get Chat History for a Game
 
 - **Description:**
   Retrieves the chat history for a specific game identified by its `gameId`. This allows players to see the messages exchanged during the game.
@@ -286,13 +303,8 @@ alias-game-api/
   - **200 OK**: Returns an array of chat messages for the specified game.
   - **500 Internal Server Error**: Returns an error message if there was an issue retrieving the chat history.
 
-- **Example Request:**
-  ```http
-  GET /123456/chat HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
 - **Example Response:**
+
   ```json
   {
     {
@@ -308,43 +320,44 @@ alias-game-api/
   }
   ```
 
-#### 7.**POST** `game/:gameId/chat/send` - Send a Message in the Game's Chat
+---
+
+#### 6.**POST** `game/:gameId/chat/send` - Send a Message in the Game's Chat
 
 - **Description:**
   Sends a chat message in the specified game's chat. This allows players to communicate with each other during the game.
 
 - **Request Body:**
-  - **Content-Type:** `application/json`
   - **Required Fields:**
     - `sender` (string): The username of the player sending the message.
     - `message` (string): The content of the message being sent.
-    - `type` (string): The type of message being sent (e.g., "text", "image").
+    - `type` (string): The type of message being sent (e.g., "description", "message").
 
 - **Response Body:**
   - **200 OK**: Returns a confirmation message indicating the message has been added to the chat.
   - **500 Internal Server Error**: Returns an error message if there was an issue adding the message to the chat.
 
 - **Example Request:**
-  ```http
-  POST /123456/chat/send HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  Content-Type: application/json
 
+  ```json
   {
       "sender": "player1",
       "message": "I am ready!",
-      "type": "text"
+      "type": "message"
   }
   ```
+
 - **Example Response:**
+
   ```json
   {
     "message": "Message added to chat"
   }
   ```
 
-#### 8. **GET** `game/:gameId/updateScore/:username/:points` - Update User's Score
+---
+
+#### 7. **GET** `game/:gameId/updateScore/:username/:points` - Update User's Score
 
 - **Description:**
   Updates the score for a specific user in the game. This endpoint is typically used to modify the score based on game actions such as guessing a word correctly.
@@ -358,93 +371,23 @@ alias-game-api/
   - **200 OK**: Returns a confirmation message indicating that the user's score has been updated.
   - **500 Internal Server Error**: Returns an error message if there was an issue updating the score.
 
-- **Example Request:**
-  ```http
-  GET /123456/updateScore/player1/10 HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
+---
 
-#### 9. **GET** `/:gameId/startTurn` - Start a New Turn
+#### 8. **GET** `game/:gameId` - Render Room Page
 
 - **Description:**
-  Initiates a new turn in the specified game. This endpoint is used to progress the game to the next round, allowing players to take their turns sequentially.
-
-- **Request Parameters:**
-  - `gameId` (string): The ID of the game where the turn should be started.
-
-- **Response Body:**
-  - **200 OK**: Returns a confirmation message indicating that the turn has started successfully.
-  - **500 Internal Server Error**: Returns an error message if there was an issue starting the turn.
-
-- **Example Request:**
-  ```http
-  GET /123456/startTurn HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
-- **Example Response:**
-  ```json
-  {
-    "message": "Turn started"
-  }
-  ```
-
-
-
-#### 10. **GET** `game/:gameId` - Render Room Page
-
-- **Description:**
-  Renders the room page for the specified game. This endpoint provides the necessary data to display the game room, including the game state, current players, and chat history.
+  Renders the room page for the specified game.
 
 - **Request Parameters:**
   - `gameId` (string): The ID of the game whose room page should be rendered.
 
 - **Response Body:**
-  - **200 OK**: Renders the game room page with the following data:
-    - `gameName` (string): The name of the game.
-    - `currentUser` (string): The username of the current user.
-    - `messages` (array): The chat history for the game.
-    - `team1` (array): The players in team 1.
-    - `team2` (array): The players in team 2.
-    - `currentTurn` (number): The current turn number.
-    - `roundTime` (number): The time allotted for each round.
-    - `totalRounds` (number): The total number of rounds in the game.
-
+  - **200 OK**: Renders the game room page.
   - **404 Not Found**: Returns an error message if the game is not found or the game ID is invalid.
 
-- **Example Request:**
-  ```http
-  GET /123456 HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
-- **Example Response:**
-  ```json
-  {
-    "gameName": "Fun Trivia",
-    "currentUser": "john_doe",
-    "messages": [
-    {
-        "sender": "Alice",
-        "message": "Hello everyone!",
-        "timestamp": "2024-10-10T10:00:00Z"
-    },
-    {
-        "sender": "Bob",
-        "message": "Let's start the game!",
-        "timestamp": "2024-10-10T10:01:00Z"
-    }
-    ],
-    "team1": ["Alice", "Charlie"],
-    "team2": ["Bob", "David"],
-    "currentTurn": 1,
-    "roundTime": 60,
-    "totalRounds": 5
-  }
-  ```
+---
 
-#### 11. **GET** `game/:gameCode/generateWord` - Generate Word for the Game
+#### 9. **GET** `game/:gameCode/generateWord` - Generate Word for the Game
 
 - **Description:**
   This endpoint generates a new word for the specified game. The generated word will be used in the game for the current round or turn.
@@ -458,19 +401,17 @@ alias-game-api/
 
   - **500 Internal Server Error**: Returns an error message if the word generation fails.
 
-- **Example Request:**
-  ```http
-  GET /game123/generateWord HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
 - **Example Response:**
+
   ```json
   {
     "word": "elephant"
   }
   ```
-#### 12. **GET** `game/:gameCode/getTeams` - Get Teams for the Game
+
+---
+
+#### 10. **GET** `game/:gameCode/getTeams` - Get Teams for the Game
 
 - **Description:**
   This endpoint retrieves the players in both teams for the specified game using its game code.
@@ -485,13 +426,8 @@ alias-game-api/
 
   - **500 Internal Server Error**: Returns an error message if there is an issue retrieving the teams.
 
-- **Example Request:**
-  ```http
-  GET /game123/getTeams HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
 - **Example Response:**
+
   ```json
   {
     "team1": ["Alice", "Bob"],
@@ -499,7 +435,9 @@ alias-game-api/
   }
   ```
 
-#### 13. **GET** `game/:gameCode/currentWord` - Get the Current Word for the Game
+---
+
+#### 11. **GET** `game/:gameCode/currentWord` - Get the Current Word for the Game
 
 - **Description:**
   This endpoint retrieves the current word that is being used in the specified game identified by its game code.
@@ -513,21 +451,98 @@ alias-game-api/
 
   - **404 Not Found**: Returns an error message if the current word could not be found for the specified game code.
 
-- **Example Request:**
-  ```http
-  GET /game123/currentWord HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  ```
 - **Example Response:**
+
   ```json
   {
     "word": "elephant"
   }
   ```
 
+---
+
+#### 12. **GET** `game/:gameCode/scores` - Get Current Scores for the Game
+
+- **Description:**
+  This endpoint retrieves the current scores for the specified game identified by its game code.
+
+- **Request Parameters:**
+  - `gameCode` (string): The unique code of the game for which the scores should be retrieved.
+
+- **Response Body:**
+  - **200 OK**: Returns the current scores for the game.
+    - `team1` (number): The score for Team 1.
+    - `team2` (number): The score for Team 2.
+
+  - **404 Not Found**: Returns an error message if the scores could not be found for the specified game code.
+
+- **Example Response:**
+
+  ```json
+  {
+  "scores": {
+      "team1": 0,
+      "team2": 0
+    }
+    }
+    ```
+
+---
+
+### 13. **GET** `game/:gameCode/switchTurn` - Switch Turn for the Game
+
+- **Description:**
+  This endpoint switches the turn for the specified game identified by its game code.
+
+- **Request Parameters:**
+  - `gameCode` (string): The unique code of the game for which the turn should be switched.
+
+- **Response Body:**
+  - **200 OK**: Returns the new turn data for the game.
+    - `currentTeam` (string): The name of the current team.
+    - `describer` (string): The name of the describer.
+    - `guessers` (array of strings): The names of the guessers.
+  - **500 Internal Server Error**: Returns an error message if there is an issue retrieving the data.
+
+- **Example Response:**
+
+  ```json
+  {
+    "currentTeam": "team2",
+    "describer": "Mikita",
+    "guessers": []
+  }
+  ```
+
+---
+
+### 14. **GET** `game/:gameCode/getTurn` - Get Turn for the Game
+
+- **Description:**
+  This endpoint retrieves the turn data for the specified game identified by its game code.
+- **Request Parameters:**
+  - `gameCode` (string): The unique code of the game for which the turn should be retrieved.
+
+  - **Response Body:**
+    - **200 OK**: Returns the turn data for the game.
+      - `currentTeam` (string): The name of the current team.
+      - `describer` (string): The name of the describer.
+      - `guessers` (array of strings): The names of the guessers.
+
+    - **500 Internal Server Error**: Returns an error message if there is an issue retrieving the data.
+
+  - **Example Response:**
+
+    ```json
+    {
+      "currentTeam": "team2",
+      "describer": "Mikita",
+      "guessers": []
+    }
+    ```
 
 ## Models
+
 ### Chat Model Documentation
 
 | Field      | Type            | Description                                         |
@@ -546,11 +561,13 @@ alias-game-api/
 #### ChatSchema
 
 The `ChatSchema` consists of a single field:
+
 - `messages`: An array containing `MessageSchema` objects.
 
 #### MessageSchema
 
 The `MessageSchema` consists of the following fields:
+
 - `timestamp`: Automatically set to the current date and time when a message is created.
 - `sender`: Required field representing the sender of the message.
 - `type`: Required field that indicates the type of message, which can either be "description" or "message".
@@ -576,12 +593,11 @@ The `MessageSchema` consists of the following fields:
 #### UserSchema
 
 The `UserSchema` consists of the following fields:
+
 - `username`: Required field for the user's username.
 - `password`: Required field for the user's password.
 - `stats`: An object containing statistics about the user's game history.
 - `createdAt`: Automatically set to the current date and time when a user is created.
-
-
 
 ### Game Model Documentation
 
@@ -618,6 +634,7 @@ The `UserSchema` consists of the following fields:
 #### GameSchema
 
 The `GameSchema` consists of the following fields:
+
 - `gameName`: Required field for the game's name.
 - `difficulty`: Required field for the game's difficulty level.
 - `roundTime`: Required field for the duration of each round.
@@ -627,7 +644,6 @@ The `GameSchema` consists of the following fields:
 - `team2`: The second team participating in the game.
 - `currentTurn`: Automatically set to 0 when the game is created.
 - `createdAt`: Automatically set to the current date and time when a game is created.
-
 
 ## Authentication and Authorization (JWT)
 
@@ -640,7 +656,8 @@ Authorization: Bearer <token>
 ## Environment Variables (`.env`)
 
 Make sure to configure the following environment variables in your `.env` file:
-```
+
+```md
 JWT_SECRET=your_jwt_secret_key
 DB_URL=your_mongodb_connection_url
 ```
@@ -649,16 +666,19 @@ DB_URL=your_mongodb_connection_url
 
 1. Clone the repository.
 2. Install the dependencies:
+
     ```bash
     npm install
     ```
+
 3. Set up your `.env` file with the necessary environment variables.
 4. Start the server:
+
     ```bash
     npm start
     ```
 
 ## Future Improvements
+
 - Add more robust error handling.
-- Implement user statistics and leaderboards.
-- Add WebSocket support for real-time chat and game updates.
+- Implement user leaderboards.

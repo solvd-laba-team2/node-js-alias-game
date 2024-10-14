@@ -93,20 +93,8 @@ export const getCurrentScores = async (req: Request, res: Response) => {
     if (err instanceof Error) {
       res.status(404).json({ error: err.message });
     } else {
-      res.status(404).json({ error: "Current word not found" });
+      res.status(404).json({ error: "Current scores not found" });
     }
-  }
-};
-
-// Add a user to the game
-export const addUser = async (req: Request, res: Response) => {
-  const { gameId, username, teamId } = req.body;
-
-  try {
-    await GameService.getInstance().addUser(gameId, teamId, username);
-    res.status(200).json({ message: `${username} added to the game` });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 };
 
@@ -154,17 +142,6 @@ export const addMessageToChat = async (req: Request, res: Response) => {
   }
 };
 
-// Start a new turn
-export const startTurn = async (req: Request, res: Response) => {
-  const { gameId } = req.params;
-  try {
-    await GameService.getInstance().startTurn(gameId);
-    res.status(200).json({ message: "Turn started" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 export const renderJoinGamePage = async (req: Request, res: Response) => {
   const games = await GameService.getInstance().getOnlyNotStartedGames();
   res.render("join-game", { games: games });
@@ -173,12 +150,12 @@ export const renderJoinGamePage = async (req: Request, res: Response) => {
 export const joinGame = async (req: Request, res: Response) => {
   const { gameCode } = req.body;
   try {
-    const game = GameService.getInstance().getGame(gameCode);
-    const games = await GameService.getInstance().getOnlyNotStartedGames();
+    const game = await GameService.getInstance().getGame(gameCode);
     if (!game) {
-      res.render("join-game", {
-        games,
+      const games = await GameService.getInstance().getOnlyNotStartedGames();
+      res.status(404).render("join-game", {
         errorMessage: "No game with such code!",
+        games,
       });
     } else {
       res.redirect(`/game/${gameCode}`);
@@ -225,11 +202,9 @@ export default {
   createGame,
   renderJoinGamePage,
   joinGame,
-  addUser,
   updateScore,
   getChatHistory,
   addMessageToChat,
-  startTurn,
   renderRoomPage,
   getGenerateWord,
   getCurrentWord,
