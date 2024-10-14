@@ -4,49 +4,53 @@ import { createUser, getUser, getUserPage, putNewPassword } from "../../controll
 import bcrypt from "bcrypt";
 
 
-jest.mock("../../models/userModel");
+jest.mock("../../models/userModel", () => ({
+    create: jest.fn(),
+}));
 jest.mock("bcrypt");
 
 describe("UserController - createUser", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
-    let consoleLogSpy: jest.SpyInstance;
-    let consoleErrorSpy: jest.SpyInstance;
+    let statusMock: jest.Mock;
+    let jsonMock: jest.Mock;
 
     beforeEach(() => {
-        req = {
-            body: { username: "testuser", password: "password123" },
-        };
-        res = {};
-
-
-        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        req = { body: { username: "testuser", password: "password123" } };
+        statusMock = jest.fn().mockReturnThis();
+        jsonMock = jest.fn();
+        res = { status: statusMock, json: jsonMock };
     });
 
-    afterEach(() => {
-
-        consoleLogSpy.mockRestore();
-        consoleErrorSpy.mockRestore();
-    });
-
-    it("should create a new user and log the user", async () => {
-        const mockUser = { username: "testuser", password: "hashedpassword" };
+    it("should create a new user and return 201 status", async () => {
+        const mockUser = { username: "testuser", stats: { gamesPlayed: 0, gamesWon: 0, wordsGuessed: 0 } };
         (User.create as jest.Mock).mockResolvedValue(mockUser);
 
         await createUser(req as Request, res as Response);
 
         expect(User.create).toHaveBeenCalledWith(req.body);
-        expect(console.log).toHaveBeenCalledWith("User created:\n", mockUser);
+        expect(statusMock).toHaveBeenCalledWith(201);
+        expect(jsonMock).toHaveBeenCalledWith({ username: mockUser.username, stats: mockUser.stats });
     });
 
-    it("should handle errors and log the error message", async () => {
+    it("should handle errors and return 500 status", async () => {
         const error = new Error("Server error");
         (User.create as jest.Mock).mockRejectedValue(error);
 
         await createUser(req as Request, res as Response);
 
-        expect(console.error).toHaveBeenCalledWith(error.message);
+        expect(statusMock).toHaveBeenCalledWith(500);
+        expect(jsonMock).toHaveBeenCalledWith({ error: error.message });
+    });
+
+    it("should handle non-Error errors", async () => {
+        const error = "Server error";
+        (User.create as jest.Mock).mockRejectedValue(error);
+
+        await createUser(req as Request, res as Response);
+
+        expect(statusMock).toHaveBeenCalledWith(500);
+        expect(jsonMock).toHaveBeenCalledWith({ error: "An unknown error occurred" });
     });
 });
 describe("UserController - getUser", () => {
@@ -65,8 +69,8 @@ describe("UserController - getUser", () => {
             status: statusMock,
             json: jsonMock,
         };
-        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     });
     afterEach(() => {
         consoleLogSpy.mockRestore();
@@ -96,7 +100,7 @@ describe("UserController - getUser", () => {
         const error = new Error("Server error");
         (User.findOne as jest.Mock).mockRejectedValueOnce(error);
 
-        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
         await getUser(req as Request, res as Response);
 
@@ -118,8 +122,8 @@ describe("UserController - getUserPage", () => {
             render: jest.fn(),
         };
 
-        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     });
 
     afterEach(() => {
@@ -194,8 +198,8 @@ describe("UserController - putNewPassword", () => {
         };
 
 
-        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {});
-        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => { });
+        consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     });
 
     afterEach(() => {
