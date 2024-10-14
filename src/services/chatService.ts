@@ -2,6 +2,7 @@ import { getOriginalId } from "../utils/hash";
 import Chat, { IChat, IMessage } from "../models/chatModel";
 import GameService from "./gameService";
 import SocketService from "./socketService";
+import { isMessageValid } from "../utils/wordCheck";
 
 class ChatService {
   chatHistory: Record<string, Partial<IMessage>[]> = {};
@@ -17,23 +18,43 @@ class ChatService {
   }
 
   // Add a message to the chat
-  async addMessageToChat(gameCode: string, sender: string, message: string) {
+  async addMessageToChat(
+    gameCode: string,
+    sender: string,
+    message: string,
+    role: string,
+    targetWord: string,
+  ) {
     if (!this.chatHistory[gameCode]) {
       this.chatHistory[gameCode] = [];
     }
+    if (role === "describer") {
+      const { validation } = isMessageValid(message, targetWord);
+      if (!validation) {
+        console.log("not ok");
+        return;
+      }
+    }
     const newMessage: Partial<IMessage> = { sender, content: message };
+
     this.chatHistory[gameCode].push(newMessage);
+
     SocketService.getInstance().emitToGameRoom(gameCode, "chatMessage", {
       user: sender,
       message,
     });
+
+    if (role === "guesser") {
+      // If user is not describer, then he is a guesser
+      this.checkGuesserMessage(gameCode, message, sender);
+    }
   }
 
   async saveChatHistory(gameCode: string) {
     const chat = await this.getOrCreateChat(gameCode);
     const gameChatHistory = this.chatHistory[gameCode] || [];
     gameChatHistory.forEach((message) => {
-      chat.messages.push({sender: message.sender, content: message.content});
+      chat.messages.push({ sender: message.sender, content: message.content });
     });
     await chat.save();
   }

@@ -158,6 +158,8 @@ const chatMessagePerformer = (e) => {
       body: JSON.stringify({
         sender: currentUser, // The data you want to send
         message: message,
+        role,
+        targetWord: targetWord || null,
       }),
     })
       .then((response) => {
