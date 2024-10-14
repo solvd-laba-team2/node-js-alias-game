@@ -260,5 +260,6 @@ const startGameHandler = () => {
 };
 
 const endGameHandler = () => {
+  showFinishedGameResult();
   showFinishedGame();
 };

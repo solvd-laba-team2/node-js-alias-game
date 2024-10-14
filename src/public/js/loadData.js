@@ -23,8 +23,8 @@ const team2ScoreElement = document.querySelector(".player-list-right h2");
 const gameId = form.dataset.gameId;
 const gameStatus = form.dataset.gameStatus;
 const currentUser = form.dataset.currentUser;
-
 const totalRounds = parseInt(form.dataset.totalRounds);
+
 // const roundTime = parseInt(form.dataset.roundTime);
 const roundTime = 5;
 
