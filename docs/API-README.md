@@ -176,6 +176,8 @@ src/
   }
   ```
 
+---
+
 #### 2. **GET** `/user` - Get User Data
 
 - **Description:** Fetches user data from the database by `username` kept in the session and renders user profile page.
@@ -185,6 +187,8 @@ src/
 - **Response:**
   - **200 OK**: Renders user profile page.
   - **500 Internal Server Error**: If something went wrong on the server.
+
+---
 
 #### 3. **PUT** `/user` - Update User Password
 
@@ -241,6 +245,9 @@ src/
     "roundTime": 60,
     "totalRounds": 5
   }
+  ```
+
+---
 
 #### 2. **GET** `game/join` - Render Join Game Page
 
@@ -249,6 +256,8 @@ src/
 
 - **Response:**
   - **200 OK**: Renders the `join-game` view with the list of available games. If there are no games available, an empty list is provided.
+
+---
 
 #### 3. **GET** `game/create` - Render Create Game Form
 
@@ -261,13 +270,14 @@ src/
 - **Response Body:**
   - **200 OK**: Renders the `create-game` view, which contains the form for game creation.
 
+---
+
 #### 4. **POST** `game/join` - Join a Game
 
 - **Description:**
   Allows a user to join an existing game by submitting the game code. The server checks if the game exists and redirects the user to the game room if successful.
 
 - **Request Body:**
-  - **Content-Type:** `application/json`
   - **Required Fields:**
     - `gameCode` (string): The unique code of the game that the user wants to join.
 - **Response Body:**
@@ -281,6 +291,8 @@ src/
       "gameCode": "123456"
   }
   ```
+
+---
 
 #### 5. **GET** `game/:gameId/chat` - Get Chat History for a Game
 
@@ -308,13 +320,14 @@ src/
   }
   ```
 
+---
+
 #### 6.**POST** `game/:gameId/chat/send` - Send a Message in the Game's Chat
 
 - **Description:**
   Sends a chat message in the specified game's chat. This allows players to communicate with each other during the game.
 
 - **Request Body:**
-  - **Content-Type:** `application/json`
   - **Required Fields:**
     - `sender` (string): The username of the player sending the message.
     - `message` (string): The content of the message being sent.
@@ -326,12 +339,7 @@ src/
 
 - **Example Request:**
 
-  ```http
-  POST /123456/chat/send HTTP/1.1
-  Host: yourdomain.com
-  Authorization: Bearer <your_jwt_token>
-  Content-Type: application/json
-
+  ```json
   {
       "sender": "player1",
       "message": "I am ready!",
@@ -347,6 +355,8 @@ src/
   }
   ```
 
+---
+
 #### 7. **GET** `game/:gameId/updateScore/:username/:points` - Update User's Score
 
 - **Description:**
@@ -361,6 +371,8 @@ src/
   - **200 OK**: Returns a confirmation message indicating that the user's score has been updated.
   - **500 Internal Server Error**: Returns an error message if there was an issue updating the score.
 
+---
+
 #### 8. **GET** `game/:gameId` - Render Room Page
 
 - **Description:**
@@ -373,11 +385,7 @@ src/
   - **200 OK**: Renders the game room page.
   - **404 Not Found**: Returns an error message if the game is not found or the game ID is invalid.
 
-- **Example Response:**
-
-  ```md
-  Room Page with all data for the game
-  ```
+---
 
 #### 9. **GET** `game/:gameCode/generateWord` - Generate Word for the Game
 
@@ -400,6 +408,8 @@ src/
     "word": "elephant"
   }
   ```
+
+---
 
 #### 10. **GET** `game/:gameCode/getTeams` - Get Teams for the Game
 
@@ -425,6 +435,8 @@ src/
   }
   ```
 
+---
+
 #### 11. **GET** `game/:gameCode/currentWord` - Get the Current Word for the Game
 
 - **Description:**
@@ -447,31 +459,35 @@ src/
   }
   ```
 
-  #### 12. **GET** `game/:gameCode/scores` - Get Current Scores for the Game
+---
 
-  - **Description:**
-    This endpoint retrieves the current scores for the specified game identified by its game code.
+#### 12. **GET** `game/:gameCode/scores` - Get Current Scores for the Game
 
-  - **Request Parameters:**
-    - `gameCode` (string): The unique code of the game for which the scores should be retrieved.
+- **Description:**
+  This endpoint retrieves the current scores for the specified game identified by its game code.
 
-  - **Response Body:**
-    - **200 OK**: Returns the current scores for the game.
-      - `team1` (number): The score for Team 1.
-      - `team2` (number): The score for Team 2.
+- **Request Parameters:**
+  - `gameCode` (string): The unique code of the game for which the scores should be retrieved.
 
-    - **404 Not Found**: Returns an error message if the scores could not be found for the specified game code.
+- **Response Body:**
+  - **200 OK**: Returns the current scores for the game.
+    - `team1` (number): The score for Team 1.
+    - `team2` (number): The score for Team 2.
 
-  - **Example Response:**
+  - **404 Not Found**: Returns an error message if the scores could not be found for the specified game code.
 
-    ```json
-    {
-    "scores": {
-        "team1": 0,
-        "team2": 0
-      }
+- **Example Response:**
+
+  ```json
+  {
+  "scores": {
+      "team1": 0,
+      "team2": 0
+    }
     }
     ```
+
+---
 
 ### 13. **GET** `game/:gameCode/switchTurn` - Switch Turn for the Game
 
@@ -498,13 +514,14 @@ src/
   }
   ```
 
-  ### 14. **GET** `game/:gameCode/getTurn` - Get Turn for the Game
+---
 
-  - **Description:**
-    This endpoint retrieves the turn data for the specified game identified by its game code.
+### 14. **GET** `game/:gameCode/getTurn` - Get Turn for the Game
 
-  - **Request Parameters:**
-    - `gameCode` (string): The unique code of the game for which the turn should be retrieved.
+- **Description:**
+  This endpoint retrieves the turn data for the specified game identified by its game code.
+- **Request Parameters:**
+  - `gameCode` (string): The unique code of the game for which the turn should be retrieved.
 
   - **Response Body:**
     - **200 OK**: Returns the turn data for the game.
@@ -664,5 +681,4 @@ DB_URL=your_mongodb_connection_url
 ## Future Improvements
 
 - Add more robust error handling.
-- Implement user statistics and leaderboards.
-- Add WebSocket support for real-time chat and game updates.
+- Implement user leaderboards.
