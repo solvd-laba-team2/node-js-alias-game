@@ -123,10 +123,10 @@ class GameService {
 
   async getCurrentScores(gameCode) {
     const game = await this.getGame(gameCode);
-    // if (game.status === "finished") {
-    //   const { team1, team2 } = game;
-    //   return { team1: team1.score, team2: team2.score };
-    // }
+    if (game.status === "finished") {
+      const { team1, team2 } = game;
+      return { team1: team1.score, team2: team2.score };
+    }
     const team1Score = game.team1.players.reduce((score, player) => {
       return score + this.getUserScore(gameCode, player);
     }, 0);
