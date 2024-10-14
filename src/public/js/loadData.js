@@ -23,9 +23,10 @@ const team2ScoreElement = document.querySelector(".player-list-right h2");
 const gameId = form.dataset.gameId;
 const gameStatus = form.dataset.gameStatus;
 const currentUser = form.dataset.currentUser;
-
 const totalRounds = parseInt(form.dataset.totalRounds);
-const roundTime = parseInt(form.dataset.roundTime);
+
+// const roundTime = parseInt(form.dataset.roundTime);
+const roundTime = 20;
 
 const team1 = { players: [] };
 const team2 = { players: [] };
@@ -44,6 +45,5 @@ let team1Score = 0;
 let team2Score = 0;
 
 const currentUrl = window.location.href;
-
 
 socket.emit("joinRoom", data);

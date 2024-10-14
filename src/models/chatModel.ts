@@ -2,9 +2,9 @@ import { Schema, Document, model } from "mongoose";
 
 // Message interface
 export interface IMessage {
-  timestamp: Date;
+  timestamp?: Date;
   sender: string;
-  type: "description" | "message";
+  type?: "description" | "message";
   content: string;
 }
 
@@ -14,17 +14,20 @@ export interface IChat extends Document {
 }
 
 const MessageSchema: Schema = new Schema({
-  timestamp: { type: Date, default: Date.now },  // Automatically setting the timestamp
+  timestamp: { type: Date, default: Date.now }, // Automatically setting the timestamp
   sender: { type: String, required: true },
-  type: { type: String, enum: ["description", "message"], required: true },
+  type: {
+    type: String,
+    enum: ["description", "message"],
+    default: "message",
+  },
   content: { type: String, required: true },
 });
 
 const ChatSchema: Schema = new Schema({
-  messages: { type: [MessageSchema], default: [] },  // Array of messages
+  messages: { type: [MessageSchema], default: [] }, // Array of messages
 });
 
 const Chat = model<IChat>("Chat", ChatSchema);
 
 export default Chat;
-
