@@ -42,8 +42,8 @@ class GameService {
       roundTime,
       totalRounds,
       status: "creating",
-      team1: { players: [], chatID: "", score: [] },
-      team2: { players: [], chatID: "", score: [] },
+      team1: { players: [], chatID: "", score: 0 },
+      team2: { players: [], chatID: "", score: 0 },
       currentTurn: 0, // Setting the current turn
       createdAt: new Date(), // Setting the creation date
     });
@@ -123,6 +123,10 @@ class GameService {
 
   async getCurrentScores(gameCode) {
     const game = await this.getGame(gameCode);
+    // if (game.status === "finished") {
+    //   const { team1, team2 } = game;
+    //   return { team1: team1.score, team2: team2.score };
+    // }
     const team1Score = game.team1.players.reduce((score, player) => {
       return score + this.getUserScore(gameCode, player);
     }, 0);
@@ -136,24 +140,29 @@ class GameService {
   async saveUserScoresToDatabase(gameCode: string): Promise<void> {
     const game = await this.getGame(gameCode);
     if (!game) throw new Error("Game not found");
-    const currentGameScores = this.userScores[gameCode] || {};
-    // Iterate over both teams and save user scores to the database
-    for (const team of [game.team1, game.team2]) {
-      for (const player of team.players) {
-        const user = await userModel.findOne({ username: player });
-        if (user) {
-          const score = currentGameScores[player] || 0;
-          user.stats.wordsGuessed += score;
-          user.stats.gamesPlayed += 1;
 
-          if (game.status === "finished") {
+    const currentGameScores = this.userScores[gameCode] || {};
+    const teamScores = await this.getCurrentScores(gameCode);
+    const team1players = game.team1.players;
+    const team2players = game.team2.players;
+    const winnerTeam =
+      teamScores.team1 > teamScores.team2 ? team1players : team2players;
+
+    // Iterate over both teams and save user scores to the database
+    for (const player of [...team1players, ...team2players]) {
+      const user = await userModel.findOne({ username: player });
+      if (user) {
+        user.stats.wordsGuessed += currentGameScores[player] || 0;
+        if (game.status === "finished") {
+          user.stats.gamesPlayed += 1;
+          if (winnerTeam.includes(player)) {
             user.stats.gamesWon += 1;
           }
-
-          await user.save();
         }
+        await user.save();
       }
     }
+
     if (this.userScores[gameCode]) {
       delete this.userScores[gameCode];
     }
