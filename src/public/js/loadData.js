@@ -46,5 +46,4 @@ let team2Score = 0;
 
 const currentUrl = window.location.href;
 
-
 socket.emit("joinRoom", data);

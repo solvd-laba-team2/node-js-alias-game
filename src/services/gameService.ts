@@ -204,30 +204,10 @@ class GameService {
 
     if (!game) throw new Error("Game not found");
     await this.saveUserScoresToDatabase(gameCode);
-    
+
     game.status = "finished";
+    await chatService.saveChatHistory(gameCode);
     await game.save();
-  }
-
-  // Add a message to the game's chat
-  async addMessage(
-    gameId: string,
-    sender: string,
-    message: string,
-    type: "description" | "message",
-  ) {
-    await chatService.addMessageToChat(gameId, sender, message, type);
-
-    // Emit chat message to all players in the game room
-    this.socketService.emitToGameRoom(gameId, "chatMessage", {
-      sender,
-      message,
-    });
-  }
-
-  // Get chat history for the game
-  async getChatHistory(gameId: string) {
-    return await chatService.getChatHistory(gameId); // Retrieve chat history from chatService
   }
 
   // Method to fetch an active game from memory

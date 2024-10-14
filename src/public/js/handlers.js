@@ -1,15 +1,23 @@
 // Functions
 
-const createNewWord = () => {
-  const request = fetch(currentUrl + "/generateWord");
-  request.then((response) => {
-    if (response.ok === true) {
-      response.json().then(({ word }) => {
-        wordField.innerText = word;
-        socket.emit("new-word", gameId);
-      });
-    }
-  });
+const loadChatHistory = async () => {
+  const response = await fetch(currentUrl + "/chat");
+  if (response.ok === true) {
+    const data = await response.json();
+    const chat = data.chat;
+    chat.forEach(({ sender, content }) => {
+      chatMessageHandler({ user: sender, message: content });
+    });
+  }
+};
+
+const createNewWord = async () => {
+  const response = await fetch(currentUrl + "/generateWord");
+  if (response.ok === true) {
+    const { word } = await response.json();
+    wordField.innerText = word;
+    socket.emit("new-word", gameId);
+  }
 };
 
 const getGameResult = () => {
@@ -138,14 +146,32 @@ const chatMessagePerformer = (e) => {
   } else {
     role = currentUser === describer ? "describer" : "guesser";
   }
+
   const message = input.value;
   if (message !== "") {
-    socket.emit("chatMessage", {
-      message,
-      ...data,
-      role,
-      targetWord: targetWord || null,
-    });
+    fetch(currentUrl + `/chat/send`, {
+      method: "POST", // Specify the HTTP method as 'POST'
+      headers: {
+        "Content-Type": "application/json", // Specify the content type
+        // You can add other headers here, like Authorization
+      },
+      body: JSON.stringify({
+        sender: currentUser, // The data you want to send
+        message: message,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json(); // Convert the response to JSON (if it's JSON data)
+      })
+      .then((data) => {
+        console.log("Success:", data); // Handle the response data
+      })
+      .catch((error) => {
+        console.error("Error:", error); // Handle any errors
+      });
   }
   input.value = "";
 };
@@ -188,12 +214,12 @@ const chatMessageHandler = (data) => {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 };
 
-const userJoinedHandler = (data) => {
+const userJoinedHandler = async (data) => {
+  await loadChatHistory();
   if (gameStatus === "finished") {
     showFinishedGame();
     return;
   }
-  console.log("gameStatus", gameStatus);
   messages.innerHTML += `<p><strong>${data.user}:</strong> joined the game!</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 

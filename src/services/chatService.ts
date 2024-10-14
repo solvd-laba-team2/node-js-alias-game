@@ -1,9 +1,13 @@
+import { getOriginalId } from "../utils/hash";
 import Chat, { IChat, IMessage } from "../models/chatModel";
 import GameService from "./gameService";
 import SocketService from "./socketService";
 
 class ChatService {
-  async getOrCreateChat(gameId: string): Promise<IChat | null> {
+  chatHistory: Record<string, Partial<IMessage>[]> = {};
+
+  async getOrCreateChat(gameCode: string): Promise<IChat | null> {
+    const gameId = getOriginalId(gameCode);
     let chat = await Chat.findById(gameId).lean(); // Using lean() to return a plain object
     if (!chat) {
       chat = new Chat({ _id: gameId });
@@ -13,26 +17,37 @@ class ChatService {
   }
 
   // Add a message to the chat
-  async addMessageToChat(
-    gameId: string,
-    sender: string,
-    message: string,
-    type: "description" | "message",
-  ) {
-    const chat = await this.getOrCreateChat(gameId);
+  async addMessageToChat(gameCode: string, sender: string, message: string) {
+    if (!this.chatHistory[gameCode]) {
+      this.chatHistory[gameCode] = [];
+    }
+    const newMessage: Partial<IMessage> = { sender, content: message };
+    this.chatHistory[gameCode].push(newMessage);
+    SocketService.getInstance().emitToGameRoom(gameCode, "chatMessage", {
+      user: sender,
+      message,
+    });
+  }
 
-    // Create a partial IMessage object, without the timestamp field
-    const newMessage: Partial<IMessage> = { sender, content: message, type };
-
-    // Add the message to the chat, TypeScript accepts partial IMessage
-    chat.messages.push(newMessage as IMessage); // Cast to IMessage
+  async saveChatHistory(gameCode: string) {
+    const chat = await this.getOrCreateChat(gameCode);
+    const gameChatHistory = this.chatHistory[gameCode] || [];
+    gameChatHistory.forEach((message) => {
+      chat.messages.push({sender: message.sender, content: message.content});
+    });
     await chat.save();
   }
 
   // Retrieve chat history for the game
-  async getChatHistory(gameId: string): Promise<IMessage[]> {
-    const chat = await Chat.findById(gameId).lean(); // lean() returns a plain object
-    return chat ? chat.messages : [];
+  async getChatHistory(gameCode: string): Promise<Partial<IMessage>[]> {
+    const game = await GameService.getInstance().getGame(gameCode);
+    if (game.status === "finished") {
+      const chat = await this.getOrCreateChat(gameCode);
+      return chat.messages;
+    }
+    return this.chatHistory[gameCode] || [];
+    // const chat = await Chat.findById(gameId).lean(); // lean() returns a plain object
+    // return chat ? chat.messages : [];
   }
 
   checkGuesserMessage(gameId: string, message: string, user: string) {
