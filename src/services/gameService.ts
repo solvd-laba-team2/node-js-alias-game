@@ -2,8 +2,9 @@ import gameModel, { IGame } from "../models/gameModel";
 import userModel from "../models/userModel";
 import chatService from "./chatService";
 import SocketService from "../services/socketService";
-import { getOriginalId } from "../utils/hash";
+import { getOriginalId, shortenId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
+import game from "src/sockets/game";
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
@@ -48,7 +49,7 @@ class GameService {
     this.socketService.emit("gameUpdated", {
       // Emit new game creation
       action: "created",
-      game: newGame,
+      game: {...newGame.toObject(), gameCode: shortenId(newGame._id.toString())},
     });
 
     return newGame; // Return the new game
@@ -231,12 +232,12 @@ class GameService {
   getRandomUser(users: string[]) {
     const user = users[Math.floor(Math.random() * users.length)];
     return user || null;
-  };
+  }
 
   getRandomTeam(): "team1" | "team2" {
     const team = Math.random() < 0.5 ? "team1" : "team2";
     return team || null;
-  };
+  }
 }
 
 export default GameService;

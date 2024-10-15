@@ -10,7 +10,7 @@ function updateGameList(game) {
     const gameListElement = document.querySelector(".game-list ul");
 
     const li = document.createElement("li");
-    li.innerHTML = `Game - ${game.gameName} <a class="button" href="/game/${game._id}">Join</a>`;
+    li.innerHTML = `Game - ${game.gameName} <a class="button" href="/game/${game.gameCode}">Join</a>`;
 
     gameListElement.appendChild(li);
 }
