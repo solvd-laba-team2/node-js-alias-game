@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import chatService from "../services/chatService";
 import GameService from "../services/gameService";
 import { shortenId, getOriginalId } from "../utils/hash";
 import { Types } from "mongoose";
@@ -9,42 +10,31 @@ export const renderCreateGameForm = (req: Request, res: Response) => {
 };
 
 export const renderRoomPage = async (req: Request, res: Response) => {
-  const gameId = req.params.gameId;
-  const id = getOriginalId(gameId);
+  const gameCode = req.params.gameId;
+  const gameId = getOriginalId(gameCode);
 
-  const errorOptions = {
-    gameName: "Game not found",
-    currentUser: res.locals.username,
-    messages: [],
-    team1: [],
-    team2: [],
-    currentTurn: 0,
-    roundTime: null,
-    totalRounds: null,
-  };
-
-  if (!Types.ObjectId.isValid(id)) {
-    return res.render("room", errorOptions);
+  if (!Types.ObjectId.isValid(gameId)) {
+    console.log("Not valid ~ renderRoomPage ~ gameId:", gameId);
+    return res.render("game-404");
   }
 
-  const game = await GameService.getInstance().getGame(gameId);
+  const game = await GameService.getInstance().getGame(gameCode);
 
   if (!game) {
-    return res.render("room", errorOptions);
+    console.log("Game not found (!game) ~ renderRoomPage ~ game:");
+    return res.render("game-404");
   }
-
-  const chatHistory = await GameService.getInstance().getChatHistory(id);
 
   res.render("room", {
     // gameId: newGame._id.toString(),
-    gameName: gameId,
+    gameName: gameCode,
     currentUser: res.locals.username,
-    messages: chatHistory,
     team1: game.team1.players,
     team2: game.team2.players,
     currentTurn: game.currentTurn,
     roundTime: game.roundTime,
     totalRounds: game.totalRounds,
+    status: game.status,
   });
 };
 
@@ -79,7 +69,7 @@ export const createGame = async (req: Request, res: Response) => {
       gameName,
       difficulty,
       roundTime,
-      totalRounds
+      totalRounds,
     ); // Creating a new game
     const shortId = shortenId(newGame._id.toString());
     res.redirect(`/game/${shortId}`);
@@ -88,15 +78,17 @@ export const createGame = async (req: Request, res: Response) => {
   }
 };
 
-// Add a user to the game
-export const addUser = async (req: Request, res: Response) => {
-  const { gameId, username, teamId } = req.body;
-
+export const getCurrentScores = async (req: Request, res: Response) => {
   try {
-    await GameService.getInstance().addUser(gameId, teamId, username);
-    res.status(200).json({ message: `${username} added to the game` });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+    const gameCode = req.params.gameCode;
+    const scores = await GameService.getInstance().getCurrentScores(gameCode);
+    res.status(200).json({ scores });
+  } catch (err) {
+    if (err instanceof Error) {
+      res.status(404).json({ error: err.message });
+    } else {
+      res.status(404).json({ error: "Current scores not found" });
+    }
   }
 };
 
@@ -106,8 +98,8 @@ export const updateScore = async (req: Request, res: Response) => {
 
   try {
     await GameService.getInstance().updateUserScoreInMemory(
-      gameId,
       username,
+      gameId,
       parseInt(points),
     );
     res
@@ -120,11 +112,10 @@ export const updateScore = async (req: Request, res: Response) => {
 
 // Get chat history
 export const getChatHistory = async (req: Request, res: Response) => {
-  const { gameId } = req.params;
-
   try {
-    const chatHistory = await GameService.getInstance().getChatHistory(gameId);
-    res.status(200).json(chatHistory);
+    const { gameCode } = req.params;
+    const chatHistory = await chatService.getChatHistory(gameCode);
+    res.status(200).json({ chat: chatHistory });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -132,24 +123,19 @@ export const getChatHistory = async (req: Request, res: Response) => {
 
 // Add a message to the chat
 export const addMessageToChat = async (req: Request, res: Response) => {
-  const { gameId } = req.params;
-  const { sender, message, type } = req.body;
-
+  const { gameCode } = req.params;
+  const { sender, message, role, targetWord, socketId } = req.body;
   try {
-    await GameService.getInstance().addMessage(gameId, sender, message, type);
+    console.log(sender, message);
+    chatService.addMessageToChat(
+      gameCode,
+      sender,
+      message,
+      role,
+      targetWord,
+      socketId,
+    );
     res.status(200).json({ message: "Message added to chat" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// Start a new turn
-export const startTurn = async (req: Request, res: Response) => {
-  const { gameId } = req.params;
-
-  try {
-    await GameService.getInstance().startTurn(gameId);
-    res.status(200).json({ message: "Turn started" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -168,12 +154,12 @@ export const renderJoinGamePage = async (req: Request, res: Response) => {
 export const joinGame = async (req: Request, res: Response) => {
   const { gameCode } = req.body;
   try {
-    const game = GameService.getInstance().getGame(gameCode);
-    const games = await GameService.getInstance().getOnlyNotStartedGames();
+    const game = await GameService.getInstance().getGame(gameCode);
     if (!game) {
-      res.render("join-game", {
+      const games = await GameService.getInstance().getOnlyNotStartedGames();
+      res.status(404).render("join-game", {
+        errorMessage: "No game with such code!",
         games,
-        errorMessage: "No game with such passcode!",
       });
     } else {
       res.redirect(`/game/${gameCode}`);
@@ -184,9 +170,10 @@ export const joinGame = async (req: Request, res: Response) => {
 };
 //endpoint to get teams
 export const getTeams = async (req: Request, res: Response) => {
-  const { gameCode } = req.body;
+  const { gameCode } = req.params;
   try {
     const game = await GameService.getInstance().getGame(gameCode);
+    console.log(game);
     const teams = { team1: game.team1.players, team2: game.team2.players };
     res.status(200).json(teams);
   } catch (error) {
@@ -194,18 +181,39 @@ export const getTeams = async (req: Request, res: Response) => {
   }
 };
 
+export const switchTurn = async (req: Request, res: Response) => {
+  const gameCode = req.params.gameCode;
+  const currentTurn = await GameService.getInstance().switchTurn(gameCode);
+  res.status(200).json(currentTurn);
+};
+
+export const getTurn = async (req: Request, res: Response) => {
+  const gameCode = req.params.gameCode;
+  const currentTurnData = await GameService.getInstance().getCurrentTurn(
+    gameCode,
+  );
+  if (!currentTurnData) {
+    res.status(404).json({
+      error: "current turn not found",
+    });
+    return;
+  }
+  res.status(200).json(currentTurnData);
+};
+
 export default {
   renderCreateGameForm,
   createGame,
   renderJoinGamePage,
   joinGame,
-  addUser,
   updateScore,
   getChatHistory,
   addMessageToChat,
-  startTurn,
   renderRoomPage,
   getGenerateWord,
   getCurrentWord,
-  getTeams
+  getTeams,
+  getCurrentScores,
+  switchTurn,
+  getTurn,
 };

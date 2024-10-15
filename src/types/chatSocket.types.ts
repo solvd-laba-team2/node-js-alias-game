@@ -13,4 +13,7 @@ export interface MessageData {
   message: string;
   gameId: string;
   user: string;
+  role: string;
+  targetWord: string;
+  socketId: string;
 }

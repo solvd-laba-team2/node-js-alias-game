@@ -1,23 +1,16 @@
 import { Schema, Document, model } from "mongoose";
 
-// Score interface definition
-interface IScore {
-  word: string;
-  status: "guessed" | "not guessed";
-  guessed: string;
-}
-
 // Team interface definition
 interface ITeam {
   players: string[];
   chatID: string;
-  score: IScore[];
+  score: number;
 }
 
 // Game interface
 export interface IGame extends Document {
-  gameName: string;  // Added field for the game name
-  difficulty: "easy" | "medium" | "hard";  // Added field for the difficulty level
+  gameName: string; // Added field for the game name
+  difficulty: "easy" | "medium" | "hard"; // Added field for the difficulty level
   status: "creating" | "playing" | "finished";
   team1: ITeam;
   team2: ITeam;
@@ -27,24 +20,22 @@ export interface IGame extends Document {
   totalRounds: number;
 }
 
-const ScoreSchema: Schema = new Schema({
-  word: { type: String },
-  status: { type: String, enum: ["guessed", "not guessed"] },
-  guessed: { type: String, default: "nobody" },
-});
-
 const TeamSchema: Schema = new Schema({
   players: { type: [String], default: [] },
   chatID: { type: String },
-  score: { type: [ScoreSchema], default: [] },
+  score: { type: Number, default: 0 },
 });
 
 // Updated game schema with gameName and difficulty fields
 const GameSchema: Schema = new Schema({
-  gameName: { type: String, required: true },  // New field for the game name
-  difficulty: { type: String, enum: ["easy", "medium", "hard"], required: true },  // New field for the difficulty level
+  gameName: { type: String, required: true }, // New field for the game name
+  difficulty: {
+    type: String,
+    enum: ["easy", "medium", "hard"],
+    required: true,
+  }, // New field for the difficulty level
   roundTime: { type: Number, required: true },
-  totalRounds: { type: Number, required: true},
+  totalRounds: { type: Number, required: true },
   status: {
     type: String,
     enum: ["creating", "playing", "finished"],
