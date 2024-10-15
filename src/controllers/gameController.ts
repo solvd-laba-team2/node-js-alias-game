@@ -13,29 +13,17 @@ export const renderRoomPage = async (req: Request, res: Response) => {
   const gameCode = req.params.gameId;
   const gameId = getOriginalId(gameCode);
 
-  const errorOptions = {
-    gameName: "Game not found",
-    currentUser: res.locals.username,
-    messages: [],
-    team1: [],
-    team2: [],
-    currentTurn: 0,
-    roundTime: null,
-    totalRounds: null,
-  };
-
   if (!Types.ObjectId.isValid(gameId)) {
-    console.log("current gameCode", gameCode);
-    console.log("current gameId", gameId);
-    return res.render("room", errorOptions);
+    console.log("Not valid ~ renderRoomPage ~ gameId:", gameId);
+    return res.render("game-404");
   }
 
   const game = await GameService.getInstance().getGame(gameCode);
 
   if (!game) {
-    return res.render("room", errorOptions);
+    console.log("Game not found (!game) ~ renderRoomPage ~ game:");
+    return res.render("game-404");
   }
-
 
   res.render("room", {
     // gameId: newGame._id.toString(),
@@ -122,9 +110,7 @@ export const updateScore = async (req: Request, res: Response) => {
 export const getChatHistory = async (req: Request, res: Response) => {
   try {
     const { gameCode } = req.params;
-    const chatHistory = await chatService.getChatHistory(
-      gameCode,
-    );
+    const chatHistory = await chatService.getChatHistory(gameCode);
     res.status(200).json({ chat: chatHistory });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -137,7 +123,14 @@ export const addMessageToChat = async (req: Request, res: Response) => {
   const { sender, message, role, targetWord, socketId } = req.body;
   try {
     console.log(sender, message);
-    chatService.addMessageToChat(gameCode, sender, message, role, targetWord, socketId);
+    chatService.addMessageToChat(
+      gameCode,
+      sender,
+      message,
+      role,
+      targetWord,
+      socketId,
+    );
     res.status(200).json({ message: "Message added to chat" });
   } catch (error) {
     res.status(500).json({ error: error.message });
