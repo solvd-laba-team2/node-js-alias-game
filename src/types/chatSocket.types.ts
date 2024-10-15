@@ -15,4 +15,5 @@ export interface MessageData {
   user: string;
   role: string;
   targetWord: string;
+  socketId: string;
 }

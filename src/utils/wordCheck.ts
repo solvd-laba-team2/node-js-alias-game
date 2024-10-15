@@ -85,6 +85,17 @@ function containsMajorityOfTargetWord(input: string, target: string): boolean {
     return percentageMatched > 66;
 }
 
+export const checkForProfanity = (message: string): { isProfane: boolean} => {
+    const tokenizedMessage = tokenizer.tokenize(message.toLowerCase());
+    for (const item of tokenizedMessage){
+        if(isProfane(item)){
+            return { isProfane: true};
+        }
+
+    }
+    return { isProfane: false};
+};
+
 // Function to validate the message
 export const isMessageValid = (message: string, targetWord: string): { validation: boolean, cheatWord?: string, comment?: string } => {
     // Tokenize the message and filter out common stop words
@@ -120,10 +131,6 @@ export const isMessageValid = (message: string, targetWord: string): { validatio
         // Check if the message contains majority of target word
         if (containsMajorityOfTargetWord(item, targetWord) || containsMajorityOfTargetWord(targetWord, item)) {
             return { validation: false, cheatWord: item, comment: "Word contains majority of target word" };
-        }
-        // Check for profanity
-        if (isProfane(item)) {
-            return { validation: false, cheatWord: item, comment: "Profane word" };
         }
     }
     // Check for hiding the target word in whole message
