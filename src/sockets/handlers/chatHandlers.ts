@@ -4,7 +4,7 @@ import { isMessageValid } from "../../utils/wordCheck";
 import GameService from "../../services/gameService";
 import SocketService from "../../services/socketService";
 import chatService from "../../services/chatService";
-import { getOriginalId } from "src/utils/hash";
+import { getOriginalId } from "../../utils/hash";
 
 export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
   socket.join(data.gameId);
