@@ -13,6 +13,7 @@ export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
   
   console.log(data.gameId);
   const game = await GameService.getInstance().getGame(data.gameId);
+  console.log(data.gameId);
   console.log("🚀 ~ handleJoinRoom ~ game:", game, "id is", getOriginalId(data.gameId));
 
   
