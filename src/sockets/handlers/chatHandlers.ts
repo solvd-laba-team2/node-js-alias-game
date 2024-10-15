@@ -10,7 +10,8 @@ export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
   console.log(`User ${data.user} joined room: ${data.gameId}`);
 
   const game = await GameService.getInstance().getGame(data.gameId);
-
+  console.log("🚀 ~ handleJoinRoom ~ game:", game);
+  
   if (
     !(
       game.team1.players.includes(data.user) ||
