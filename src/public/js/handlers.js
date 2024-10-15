@@ -160,6 +160,7 @@ const chatMessagePerformer = (e) => {
         message: message,
         role,
         targetWord: targetWord || null,
+        socketId: socket.id,
       }),
     })
       .then((response) => {
@@ -212,7 +213,7 @@ const newWordHandler = () => {
 };
 
 const chatMessageHandler = (data) => {
-  messages.innerHTML += `<p><strong>${data.user}:</strong> ${data.message}</p>`;
+  messages.innerHTML += `<p><strong>${data.user || "Game Validator"}:</strong> ${data.message}</p>`;
   chatWindow.scrollTop = chatWindow.scrollHeight;
 };
 

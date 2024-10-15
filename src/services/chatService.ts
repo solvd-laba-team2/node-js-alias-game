@@ -2,7 +2,8 @@ import { getOriginalId } from "../utils/hash";
 import Chat, { IChat, IMessage } from "../models/chatModel";
 import GameService from "./gameService";
 import SocketService from "./socketService";
-import { isMessageValid } from "../utils/wordCheck";
+import { isMessageValid, checkForProfanity } from "../utils/wordCheck";
+
 
 class ChatService {
   chatHistory: Record<string, Partial<IMessage>[]> = {};
@@ -24,16 +25,26 @@ class ChatService {
     message: string,
     role: string,
     targetWord: string,
+    socketId: string
   ) {
     if (!this.chatHistory[gameCode]) {
       this.chatHistory[gameCode] = [];
     }
     if (role === "describer") {
-      const { validation } = isMessageValid(message, targetWord);
+      const { validation, cheatWord } = isMessageValid(message, targetWord);
       if (!validation) {
-        console.log("not ok");
+        SocketService.getInstance().emitToSocket(socketId, "chatMessage", {
+          message: `You can't use "${cheatWord}" this time`,
+        });
         return;
       }
+    }
+      const { isProfane } = checkForProfanity(message);
+      if (isProfane) {
+        SocketService.getInstance().emitToSocket(socketId, "chatMessage", {
+          message: `Please, do not use inappropriate language`,
+        });
+        return;
     }
     const newMessage: Partial<IMessage> = { sender, content: message };
 

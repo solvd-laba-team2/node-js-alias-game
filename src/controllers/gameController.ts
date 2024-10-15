@@ -136,10 +136,10 @@ export const getChatHistory = async (req: Request, res: Response) => {
 // Add a message to the chat
 export const addMessageToChat = async (req: Request, res: Response) => {
   const { gameCode } = req.params;
-  const { sender, message, role, targetWord } = req.body;
+  const { sender, message, role, targetWord, socketId } = req.body;
   try {
     console.log(sender, message);
-    chatService.addMessageToChat(gameCode, sender, message, role, targetWord);
+    chatService.addMessageToChat(gameCode, sender, message, role, targetWord, socketId);
     res.status(200).json({ message: "Message added to chat" });
   } catch (error) {
     res.status(500).json({ error: error.message });

@@ -39,6 +39,10 @@ class SocketService {
     this.io.to(gameId).emit(event, data);
   }
 
+  emitToSocket(socketId: string, event: string, data: any) {
+    this.io.to(socketId).emit(event, data);
+  }
+  
   emit(event: string, data: any) {
     this.io.emit(event, data);
   }
