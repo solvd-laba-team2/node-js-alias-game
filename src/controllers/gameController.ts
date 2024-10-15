@@ -25,6 +25,8 @@ export const renderRoomPage = async (req: Request, res: Response) => {
   };
 
   if (!Types.ObjectId.isValid(gameId)) {
+    console.log("current gameCode", gameCode);
+    console.log("current gameId", gameId);
     return res.render("room", errorOptions);
   }
 
