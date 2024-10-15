@@ -4,7 +4,7 @@ import chatService from "./chatService";
 import SocketService from "../services/socketService";
 import { getOriginalId, shortenId } from "../utils/hash";
 import { generateWord, difficultyWordOptions } from "../utils/randomWords";
-import game from "src/sockets/game";
+
 class GameService {
   private socketService: SocketService;
   private static _instance: GameService | null = null;
