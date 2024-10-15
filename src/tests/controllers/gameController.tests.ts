@@ -101,7 +101,7 @@ describe("GameController - createGame", () => {
 //             locals: { username: "testuser" }
 //         };
 //
-//         // Mockowanie funkcji hash (getOriginalId)
+//
 //         (getOriginalId as jest.Mock).mockReturnValue("mockedObjectId");
 //     });
 //

@@ -4,13 +4,19 @@ import { isMessageValid } from "../../utils/wordCheck";
 import GameService from "../../services/gameService";
 import SocketService from "../../services/socketService";
 import chatService from "../../services/chatService";
+import { getOriginalId } from "../../utils/hash";
 
 export const handleJoinRoom = async (socket: Socket, data: JoinData) => {
   socket.join(data.gameId);
   console.log(`User ${data.user} joined room: ${data.gameId}`);
 
+  
+  console.log(data.gameId);
   const game = await GameService.getInstance().getGame(data.gameId);
+  console.log(data.gameId);
+  console.log("🚀 ~ handleJoinRoom ~ game:", game, "id is", getOriginalId(data.gameId));
 
+  
   if (
     !(
       game.team1.players.includes(data.user) ||
