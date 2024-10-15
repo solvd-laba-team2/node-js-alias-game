@@ -9,7 +9,6 @@ export const createUser = async (
   try {
     const newUser = await User.create(req.body);
     console.log("User created:\n", newUser);
-    res.status(201).json({ username: newUser.username, stats: newUser.stats });
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error(error.message);
