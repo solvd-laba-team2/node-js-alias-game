@@ -127,7 +127,7 @@ export const addMessageToChat = async (req: Request, res: Response) => {
   const { sender, message, role, targetWord, socketId } = req.body;
   try {
     console.log(sender, message);
-    chatService.addMessageToChat(
+    await chatService.addMessageToChat(
       gameCode,
       sender,
       message,
