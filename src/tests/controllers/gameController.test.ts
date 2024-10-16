@@ -2,19 +2,16 @@ import { Request, Response } from "express";
 import GameService from "../../services/gameService";
 import {
     createGame
-    , renderRoomPage
     , getGenerateWord
     , getCurrentWord
-    , addUser
     , updateScore
     , getChatHistory
     , addMessageToChat
-    ,renderJoinGamePage
-    ,startTurn
+    , renderJoinGamePage
 
 } from "../../controllers/gameController";
-import { getOriginalId } from "../../utils/hash";
 import { shortenId } from "../../utils/hash";
+import chatService from "../../services/chatService";
 // import { Types } from "mongoose";
 
 jest.mock("../../services/gameService", () => ({
@@ -24,12 +21,8 @@ jest.mock("../../services/gameService", () => ({
         getChatHistory: jest.fn(),
         generateWord: jest.fn(),
         getCurrentWord: jest.fn(),
-        addUser: jest.fn(),
         updateUserScoreInMemory: jest.fn(),
-        addMessage: jest.fn(),
         getOnlyNotStartedGames: jest.fn(),
-        startTurn: jest.fn()
-
     }),
 }));
 
@@ -38,13 +31,25 @@ jest.mock("../../utils/hash", () => ({
     getOriginalId: jest.fn(),
 }));
 
+jest.mock("../../services/socketService", () => ({
+    getInstance: jest.fn().mockReturnValue({
+        emitToGameRoom: jest.fn(),
+        emitToSocket: jest.fn(),
+        emit: jest.fn(),
+    }),
+}));
+
+jest.mock("../../services/chatService", () => ({
+    getChatHistory: jest.fn(),
+    addMessageToChat: jest.fn(),
+}));
+
 describe("GameController - createGame", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
     let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
     let redirectMock: jest.Mock;
-
+    let jsonMock: jest.Mock;
     beforeEach(() => {
         req = {
             body: {
@@ -56,12 +61,12 @@ describe("GameController - createGame", () => {
         };
 
         statusMock = jest.fn().mockReturnThis();
-        jsonMock = jest.fn();
         redirectMock = jest.fn();
+        jsonMock = jest.fn();
         res = {
             status: statusMock,
-            json: jsonMock,
             redirect: redirectMock,
+            json: jsonMock,
         };
     });
 
@@ -83,8 +88,7 @@ describe("GameController - createGame", () => {
     });
 
     it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().createGame as jest.Mock).mockRejectedValue(error);
+        (GameService.getInstance().createGame as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await createGame(req as Request, res as Response);
 
@@ -93,67 +97,6 @@ describe("GameController - createGame", () => {
     });
 });
 
-// describe("renderRoomPage", () => {
-//     let req: Partial<Request>;
-//     let res: Partial<Response>;
-//     let renderMock: jest.Mock;
-//
-//     beforeEach(() => {
-//         req = { params: { gameId: "mockedGameId" } };
-//         renderMock = jest.fn();
-//         res = {
-//             render: renderMock,
-//             locals: { username: "testuser" }
-//         };
-//
-//
-//         (getOriginalId as jest.Mock).mockReturnValue("mockedObjectId");
-//     });
-//
-//     it("should render room with error if gameId is invalid", async () => {
-//         (getOriginalId as jest.Mock).mockReturnValueOnce("invalidId");
-//
-//         await renderRoomPage(req as Request, res as Response);
-//
-//         expect(renderMock).toHaveBeenCalledWith("room", expect.objectContaining({
-//             gameName: "Game not found",
-//             currentUser: "testuser",
-//             messages: [],
-//             team1: [],
-//             team2: [],
-//             currentTurn: 0,
-//             roundTime: null,
-//             totalRounds: null
-//         }));
-//     });
-//
-//     it("should render room with game data if game exists", async () => {
-//         const mockGame = {
-//             team1: { players: ["player1"] },
-//             team2: { players: ["player2"] },
-//             currentTurn: 1,
-//             roundTime: 60,
-//             totalRounds: 5
-//         };
-//         const mockChatHistory = ["message1", "message2"];
-//
-//         (GameService.getInstance().getGame as jest.Mock).mockResolvedValueOnce(mockGame);
-//         (GameService.getInstance().getChatHistory as jest.Mock).mockResolvedValueOnce(mockChatHistory);
-//
-//         await renderRoomPage(req as Request, res as Response);
-//
-//         expect(renderMock).toHaveBeenCalledWith("room", {
-//             gameName: "mockedGameId",
-//             currentUser: "testuser",
-//             messages: mockChatHistory,
-//             team1: mockGame.team1.players,
-//             team2: mockGame.team2.players,
-//             currentTurn: mockGame.currentTurn,
-//             roundTime: mockGame.roundTime,
-//             totalRounds: mockGame.totalRounds
-//         });
-//     });
-// });
 describe("getGenerateWord", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
@@ -187,8 +130,7 @@ describe("getGenerateWord", () => {
 
     it("should handle errors and return status 500", async () => {
         // Mocking an error case
-        const error = new Error("Server error");
-        (GameService.getInstance().generateWord as jest.Mock).mockRejectedValue(error);
+        (GameService.getInstance().generateWord as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await getGenerateWord(req as Request, res as Response);
 
@@ -234,46 +176,6 @@ describe("GameController - getCurrentWord", () => {
     });
 });
 
-describe("GameController - addUser", () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-
-    beforeEach(() => {
-        req = {
-            body: { gameId: "mockedGameId", username: "testuser", teamId: "team1" },
-        };
-        statusMock = jest.fn().mockReturnThis();
-        jsonMock = jest.fn();
-        res = {
-            status: statusMock,
-            json: jsonMock,
-        };
-    });
-
-    it("should add the user to the game and return status 200", async () => {
-        await addUser(req as Request, res as Response);
-
-        expect(GameService.getInstance().addUser).toHaveBeenCalledWith(
-            "mockedGameId",
-            "team1",
-            "testuser"
-        );
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ message: "testuser added to the game" });
-    });
-
-    it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().addUser as jest.Mock).mockRejectedValue(error);
-
-        await addUser(req as Request, res as Response);
-
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: "Server error" });
-    });
-});
 describe("GameController - updateScore", () => {
     let req: Partial<Request>;
     let res: Partial<Response>;
@@ -285,7 +187,7 @@ describe("GameController - updateScore", () => {
             params: {
                 gameId: "mockedGameId",
                 username: "testuser",
-                points: "10", // Points are passed as a string in params
+                points: "10",
             },
         };
         statusMock = jest.fn().mockReturnThis();
@@ -300,9 +202,9 @@ describe("GameController - updateScore", () => {
         await updateScore(req as Request, res as Response);
 
         expect(GameService.getInstance().updateUserScoreInMemory).toHaveBeenCalledWith(
-            "mockedGameId",
             "testuser",
-            10 // Points should be parsed to an integer
+            "mockedGameId",
+            10,
         );
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({
@@ -311,8 +213,7 @@ describe("GameController - updateScore", () => {
     });
 
     it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().updateUserScoreInMemory as jest.Mock).mockRejectedValue(error);
+        (GameService.getInstance().updateUserScoreInMemory as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await updateScore(req as Request, res as Response);
 
@@ -329,7 +230,7 @@ describe("GameController - getChatHistory", () => {
     beforeEach(() => {
         req = {
             params: {
-                gameId: "mockedGameId",
+                gameCode: "mockedGameCode",
             },
         };
         statusMock = jest.fn().mockReturnThis();
@@ -342,23 +243,33 @@ describe("GameController - getChatHistory", () => {
 
     it("should return chat history with status 200", async () => {
         const mockChatHistory = ["message1", "message2"];
-        (GameService.getInstance().getChatHistory as jest.Mock).mockResolvedValue(mockChatHistory);
+        (chatService.getChatHistory as jest.Mock).mockResolvedValue(mockChatHistory);
 
         await getChatHistory(req as Request, res as Response);
 
-        expect(GameService.getInstance().getChatHistory).toHaveBeenCalledWith("mockedGameId");
+        expect(chatService.getChatHistory).toHaveBeenCalledWith("mockedGameCode");
         expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith(mockChatHistory);
+        expect(res.json).toHaveBeenCalledWith({ chat: mockChatHistory });
     });
 
     it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().getChatHistory as jest.Mock).mockRejectedValue(error);
+        (chatService.getChatHistory as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await getChatHistory(req as Request, res as Response);
 
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({ error: "Server error" });
+    });
+
+    it("should return empty chat history with status 200", async () => {
+        const mockChatHistory = [];
+        (chatService.getChatHistory as jest.Mock).mockResolvedValue(mockChatHistory);
+
+        await getChatHistory(req as Request, res as Response);
+
+        expect(chatService.getChatHistory).toHaveBeenCalledWith("mockedGameCode");
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith({ chat: mockChatHistory });
     });
 });
 describe("GameController - addMessageToChat", () => {
@@ -370,12 +281,14 @@ describe("GameController - addMessageToChat", () => {
     beforeEach(() => {
         req = {
             params: {
-                gameId: "mockedGameId",
+                gameCode: "mockedGameCode",
             },
             body: {
                 sender: "player1",
                 message: "Hello",
-                type: "chat",
+                role: "describer",
+                targetWord: "mockedTargetWord",
+                socketId: "mockedSocketId",
             },
         };
 
@@ -390,19 +303,20 @@ describe("GameController - addMessageToChat", () => {
     it("should add message to chat and return status 200", async () => {
         await addMessageToChat(req as Request, res as Response);
 
-        expect(GameService.getInstance().addMessage).toHaveBeenCalledWith(
-            "mockedGameId",
+        expect(chatService.addMessageToChat).toHaveBeenCalledWith(
+            "mockedGameCode",
             "player1",
             "Hello",
-            "chat"
+            "describer",
+            "mockedTargetWord",
+            "mockedSocketId",
         );
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({ message: "Message added to chat" });
     });
 
     it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().addMessage as jest.Mock).mockRejectedValue(error);
+        (chatService.addMessageToChat as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await addMessageToChat(req as Request, res as Response);
 
@@ -422,7 +336,7 @@ describe("GameController - renderJoinGamePage", () => {
         res = {
             render: renderMock,
         };
-        consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+        consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
     });
 
     afterEach(() => {
@@ -443,58 +357,11 @@ describe("GameController - renderJoinGamePage", () => {
     });
 
     it("should handle errors and render an empty list if there's an issue", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().getOnlyNotStartedGames as jest.Mock).mockRejectedValue(error);
+        (GameService.getInstance().getOnlyNotStartedGames as jest.Mock).mockRejectedValue(new Error("Server error"));
 
         await renderJoinGamePage(req as Request, res as Response);
 
         expect(GameService.getInstance().getOnlyNotStartedGames).toHaveBeenCalled();
         expect(res.render).toHaveBeenCalledWith("join-game", { games: [] });
-    });
-});
-
-
-describe("GameController - startTurn", () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
-    let statusMock: jest.Mock;
-    let jsonMock: jest.Mock;
-    let consoleSpy: jest.SpyInstance; // Dodajemy consoleSpy
-
-    beforeEach(() => {
-        req = { params: { gameId: "mockedGameId" } };
-
-        statusMock = jest.fn().mockReturnThis();
-        jsonMock = jest.fn();
-        res = {
-            status: statusMock,
-            json: jsonMock,
-        };
-
-
-        consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
-    });
-
-    afterEach(() => {
-
-        consoleSpy.mockRestore();
-    });
-
-    it("should start a turn and return success message", async () => {
-        await startTurn(req as Request, res as Response);
-
-        expect(GameService.getInstance().startTurn).toHaveBeenCalledWith("mockedGameId");
-        expect(res.status).toHaveBeenCalledWith(200);
-        expect(res.json).toHaveBeenCalledWith({ message: "Turn started" });
-    });
-
-    it("should handle errors and return status 500", async () => {
-        const error = new Error("Server error");
-        (GameService.getInstance().startTurn as jest.Mock).mockRejectedValue(error);
-
-        await startTurn(req as Request, res as Response);
-
-        expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({ error: "Server error" });
     });
 });
