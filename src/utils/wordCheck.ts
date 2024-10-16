@@ -3,7 +3,7 @@ import { isProfane } from "no-profanity";
 
 // Initialize tokenizer
 const tokenizer = new natural.WordTokenizer();
-
+console.log(tokenizer);
 // List of most common stopwords in English
 const stopWords: string[] = [
     "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you",

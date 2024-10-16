@@ -42,16 +42,17 @@ export const getUserPage = async (req: Request, res: Response): Promise<any> => 
       console.log(`No user with username: ${username}, logged out`);
       res.clearCookie("username");
       res.clearCookie("token");
-      res.render("login", { title: "Login", page: "login", errorMessage: null });
+      return res.render("login", { title: "Login", page: "login", errorMessage: null });
     }
+
     console.log("Found user:\n", user);
-    res.render("user", {
+    return res.render("user", {
       title: "Profile",
       page: "user",
       username: user.username,
-      gamesPlayed: user.stats.gamesPlayed,
-      gamesWon: user.stats.gamesWon,
-      wordsGuessed: user.stats.wordsGuessed
+      gamesPlayed: user.stats?.gamesPlayed || 0,
+      gamesWon: user.stats?.gamesWon || 0,
+      wordsGuessed: user.stats?.wordsGuessed || 0
     });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -59,6 +60,7 @@ export const getUserPage = async (req: Request, res: Response): Promise<any> => 
     }
   }
 };
+
 
 
 export const putNewPassword = async (req: Request, res: Response): Promise<any> => {
